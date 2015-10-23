@@ -1,0 +1,10 @@
+{
+  "applications": {
+    "PathToMath": {
+      "applicationId": ""
+    },
+    "_default": {
+      "link": "PathToMath"
+    }
+  }
+}
