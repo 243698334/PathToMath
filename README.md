@@ -12,7 +12,7 @@ An app for pre-school children to learn basic math operations used by the Depart
 PathToMath requires iOS 8. 
 
 
-1. Install all project dependencies from [CocoaPods](http://cocoapods.org/#install). Use the `.xcworkspace` file to open the projcet.
+- Install all project dependencies from [CocoaPods](http://cocoapods.org/#install). Use the `.xcworkspace` file to open the projcet.
 
 ````
 cd PathToMath-iOS
@@ -20,11 +20,11 @@ pod install
 open PathToMath.xcworkspace
 ````
 
-2. Open the Xcode workspace at `PathToMath-iOS/PathToMath.xcworkspace`.
+- Open the Xcode workspace at `PathToMath-iOS/PathToMath.xcworkspace`.
 
-3. Create your PathToMath App on [Parse](https://parse.com/apps).
+- Create your PathToMath App on [Parse](https://parse.com/apps).
 
-4. Copy your new app's application id and client key into `AppDelegate.m`:
+- Copy your new app's application id and client key into `AppDelegate.m`:
 
 ````swift
 Parse.setApplicationId("APPLICATION_ID", clientKey: "CLIENT_KEY")
