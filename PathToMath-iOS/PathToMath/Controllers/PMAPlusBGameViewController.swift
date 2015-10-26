@@ -9,9 +9,7 @@
 import UIKit
 
 class PMAPlusBGameViewController: PMGameViewController {
-    
-    private var cloudInteractionCount: Int = 0
-    
+        
     override func showInteractionHintOverlayOnCloudInGameView(gameView: PMGameView) {
         gameView.showTapInteractionHintOverlayOnCloud()
     }

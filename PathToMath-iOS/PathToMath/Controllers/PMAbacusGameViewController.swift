@@ -9,8 +9,6 @@
 import UIKit
 
 class PMAbacusGameViewController: PMGameViewController {
-
-    private var cloudInteractionCount: Int = 0
     
     override func showInteractionHintOverlayOnCloudInGameView(gameView: PMGameView) {
         gameView.showDragAndDropInteractionHintOverlayOnCloud()

@@ -9,8 +9,6 @@
 import UIKit
 
 class PMNumbersGameViewController: PMGameViewController {
-
-    private var cloudInteractionCount: Int = 0
     
     override func showInteractionHintOverlayOnCloudInGameView(gameView: PMGameView) {
         gameView.showDragAndDropInteractionHintOverlayOnCloud()
@@ -39,7 +37,6 @@ class PMNumbersGameViewController: PMGameViewController {
             for i in 1...leftBasketNumber {
                 animationDelay += 1.0
                 self.performGameViewAnimation({ (duration) -> Void in
-                    NSLog("restore")
                     gameView.restoreNextItemInCloudsToBasketWithDuration(0.5)
                     self.playSoundWithName(String(i))
                 }, duration: 1.0, delay: animationDelay, completion: nil)
@@ -49,7 +46,6 @@ class PMNumbersGameViewController: PMGameViewController {
             for i in 1...rightBasketNumber {
                     animationDelay += 1.0
                     self.performGameViewAnimation({ (duration) -> Void in
-                    NSLog("highlight")
                     gameView.highlightNextItemInRightBasketWithDuration(0.5)
                     self.playSoundWithName(String(i))
                 }, duration: 1.0, delay: animationDelay, completion: nil)
