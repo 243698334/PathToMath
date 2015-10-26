@@ -9,7 +9,6 @@
 let kPMGameProgressClassName = "GameProgress"
 let kPMGameProgressUserKey = "user"
 let kPMGameProgressLevelKey = "level"
-let kPMGameProgressSubLevelKey = "subLevel"
 
 let kPMLocalDatastoreGameProgressPinName = "GameProgress"
 
@@ -18,10 +17,9 @@ class PMGameProgress: PFObject, PFSubclassing {
     @NSManaged var user: PMUser!
     @NSManaged var mode: String
     @NSManaged var level: Int
-    @NSManaged var subLevel: Int
     
     class func parseClassName() -> String {
         return kPMGameProgressClassName
     }
-
+    
 }

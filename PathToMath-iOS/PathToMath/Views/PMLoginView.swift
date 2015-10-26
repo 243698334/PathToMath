@@ -118,6 +118,7 @@ class PMLoginView: UIView, UITextFieldDelegate {
         self.guestButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         self.guestButton.titleLabel?.font = self.guestButton.titleLabel?.font.fontWithSize(UIFont.smallSystemFontSize())
         self.guestButton.addTarget(self, action: "didTapGuestButton:", forControlEvents: .TouchUpInside)
+        self.guestButton.hidden = true // TODO: Delete this
         self.addSubview(self.guestButton)
     }
     

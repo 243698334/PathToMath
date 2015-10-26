@@ -40,6 +40,7 @@ class PMGameViewController: UIViewController, PMProgressSummaryViewDataSource, P
     var currentProblemResponse: PMProblemResponse!
     var problemResponses: [PMProblemResponse]!
     var sessionPerformance: PMSessionPerformance!
+    var cloudInteractionCount: Int!
     
     private var progressSummaryView: PMProgressSummaryView!
     private var gameInstructionView: PMGameInstructionView!
@@ -297,6 +298,7 @@ class PMGameViewController: UIViewController, PMProgressSummaryViewDataSource, P
         self.sessionPerformance.level = self.gameProgress.level
         self.sessionPerformance.totalProblems = self.problems.count
         self.sessionPerformance.responses = [PMProblemResponse]()
+        self.cloudInteractionCount = 0
     }
     
     private func didFinishCurrentSession() {
@@ -359,6 +361,7 @@ class PMGameViewController: UIViewController, PMProgressSummaryViewDataSource, P
         self.gameState = .Feedback
         
         self.gameView.flipBasketAboveAtPosition(.Left)
+        self.gameView.disableUserInteractionOnBaskets()
         self.playFeedbackAudioWithCorrectness(correctness, completion: nil)
         self.performGameViewAnimation({ (duration) -> Void in
             if (correctness == true) {
