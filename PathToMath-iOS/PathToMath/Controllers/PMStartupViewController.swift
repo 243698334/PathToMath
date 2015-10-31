@@ -14,6 +14,7 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     private var backgroundImageView: UIImageView!
     private var logoImage: UIImage!
     private var logoImageView: UIImageView!
+    private var termsAndAcknowledgementButton: UIButton!
     private var copyrightLabel: UILabel!
     private var loginView: PMLoginView!
     private var startGameView: PMStartGameView!
@@ -39,6 +40,13 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
         self.logoImageView.frame = CGRectMake(0, 0, self.view.bounds.width * 0.618, (self.view.bounds.width * 0.618) * (self.logoImage.size.height / self.logoImage.size.width))
         self.logoImageView.center = self.view.center
         self.view.addSubview(self.logoImageView)
+        
+        self.termsAndAcknowledgementButton = UIButton(frame: CGRect(x: 0, y: CGRectGetMaxY(self.view.frame) - 50, width: 180, height: 20))
+        self.termsAndAcknowledgementButton.center = CGPoint(x: self.view.bounds.width / 2.0, y: self.termsAndAcknowledgementButton.center.y)
+        self.termsAndAcknowledgementButton.titleLabel?.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
+        self.termsAndAcknowledgementButton.setAttributedTitle(NSAttributedString(string: "Terms and Acknowledgement", attributes: [NSUnderlineStyleAttributeName: NSUnderlineStyle.StyleSingle.rawValue]), forState: .Normal)
+        self.termsAndAcknowledgementButton.addTarget(self, action: "didTapTermsAndAcknowledgementButton:", forControlEvents: .TouchUpInside)
+        self.view.addSubview(self.termsAndAcknowledgementButton)
         
         self.copyrightLabel = UILabel(frame: CGRect(x: 0, y: CGRectGetMaxY(self.view.frame) - 30, width: self.view.bounds.width, height: 30))
         self.copyrightLabel.textColor = UIColor.whiteColor()
@@ -350,6 +358,23 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
         }
     }
     
+    private func presentLegalInfoViewController() {
+        let legalInfoViewController = PMLegalInfoViewController()
+        legalInfoViewController.modalPresentationStyle = .FormSheet
+        self.presentViewController(legalInfoViewController, animated: true, completion: nil)
+        
+        let sharedDataQuery = PMSharedData.query()
+        if (self.internetReachability.currentReachabilityStatus() == NotReachable) {
+            sharedDataQuery?.fromPinWithName(kPMLocalDatastoreSharedDataPinName)
+        }
+        sharedDataQuery?.whereKey(kPMSharedDataKeyKey, equalTo: kPMSharedDataLegalInfoPageURLKeyKey)
+        sharedDataQuery?.getFirstObjectInBackgroundWithBlock({ (sharedData: PFObject?, error: NSError?) -> Void in
+            let sharedData = sharedData as! PMSharedData
+            let legalInfoPageURLString = sharedData.sharedDataValue
+            legalInfoViewController.loadLegalInfoPageWithURLString(legalInfoPageURLString)
+        })
+    }
+    
     private func presentGameViewControllerWithGameProgress(gameProgress: PMGameProgress, problems: [PMProblem]) {
         let gameViewController: PMGameViewController!
         switch gameProgress.mode {
@@ -544,6 +569,10 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
         }
     }
     
+    func didTapTermsAndAcknowledgementButton(button: UIButton) {
+        self.presentLegalInfoViewController()
+    }
+    
     
     // MARK: LoginViewDataSource
     
@@ -623,6 +652,8 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     func didTapGuestButtonInLoginView(loginView: PMLoginView) {
         
     }
+    
+
 
     // MARK: MFMailComposeViewControllerDelegate
     

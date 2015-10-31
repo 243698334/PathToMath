@@ -14,7 +14,7 @@ let kPMSharedDataProblemSetVersionKeyKey = "problemSetVersion"
 let kPMSharedDataLevelUpCorrectnessKeyKey = "levelUpCorrectness"
 let kPMSharedDataSupportContactNameKeyKey = "supportContactName"
 let kPMSharedDataSupportContactEmailKeyKey = "supportContactEmail"
-let kPMSharedDataAcknowledgementPageURLKeyKey = "acknowledgementPageURL"
+let kPMSharedDataLegalInfoPageURLKeyKey = "legalInfoPageURL"
 
 let kPMLocalDatastoreSharedDataPinName = "SharedData"
 

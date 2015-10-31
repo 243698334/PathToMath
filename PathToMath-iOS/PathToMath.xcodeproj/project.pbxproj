@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E336E6A1BE4ED7500983DE0 /* PMLegalInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E336E691BE4ED7500983DE0 /* PMLegalInfoViewController.swift */; };
 		0E34A7051BD6E603009EF978 /* Correct1.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0E34A6D71BD6E603009EF978 /* Correct1.wav */; };
 		0E34A7061BD6E603009EF978 /* Correct2.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0E34A6D81BD6E603009EF978 /* Correct2.wav */; };
 		0E34A7071BD6E603009EF978 /* Wrong1.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0E34A6D91BD6E603009EF978 /* Wrong1.wav */; };
@@ -100,6 +101,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0E336E691BE4ED7500983DE0 /* PMLegalInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PMLegalInfoViewController.swift; sourceTree = "<group>"; };
 		0E34A6D71BD6E603009EF978 /* Correct1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Correct1.wav; sourceTree = "<group>"; };
 		0E34A6D81BD6E603009EF978 /* Correct2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Correct2.wav; sourceTree = "<group>"; };
 		0E34A6D91BD6E603009EF978 /* Wrong1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Wrong1.wav; sourceTree = "<group>"; };
@@ -324,6 +326,7 @@
 				0E6578A01BD61E4600524473 /* PMGameViewController.swift */,
 				0E6578A11BD61E4600524473 /* PMNumbersGameViewController.swift */,
 				0E6578A21BD61E4600524473 /* PMStartupViewController.swift */,
+				0E336E691BE4ED7500983DE0 /* PMLegalInfoViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -645,6 +648,7 @@
 				0E6578CF1BD61E4600524473 /* PMSideMenuView.swift in Sources */,
 				0E6578C11BD61E4600524473 /* PMGameProgress.swift in Sources */,
 				0E6578BD1BD61E4600524473 /* PMGameViewController.swift in Sources */,
+				0E336E6A1BE4ED7500983DE0 /* PMLegalInfoViewController.swift in Sources */,
 				0E6578B91BD61E4600524473 /* PMAbacusGameViewController.swift in Sources */,
 				0E6578D01BD61E4600524473 /* PMStartGameView.swift in Sources */,
 				0E6578C61BD61E4600524473 /* PMUser.m in Sources */,
@@ -784,7 +788,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Kevin Yufei Chen (L26MMJT3VJ)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Kevin Yufei Chen (L26MMJT3VJ)";
 				INFOPLIST_FILE = PathToMath/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -804,7 +808,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Kevin Yufei Chen (L26MMJT3VJ)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Kevin Yufei Chen (L26MMJT3VJ)";
 				INFOPLIST_FILE = PathToMath/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
