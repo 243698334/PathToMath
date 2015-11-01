@@ -104,7 +104,7 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     }
     
     private func showGameLogo(completion: ((Void) -> Void)?) {
-        UIView.animateWithDuration(1.5, delay: 0.1, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
+        UIView.animateWithDuration(1.5, delay: 0.5, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
             self.logoImageView.center = CGPointMake(self.logoImageView.center.x, self.view.bounds.height * 0.25)
         }, completion: { finished in
             if (finished) {

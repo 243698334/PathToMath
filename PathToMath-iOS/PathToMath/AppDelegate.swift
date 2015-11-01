@@ -46,16 +46,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         PMAppSession.applicationDidBecomeActive()
     }
     
-    func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {
-        let currentInstallation = PFInstallation.currentInstallation()
-        currentInstallation.setDeviceTokenFromData(deviceToken)
-        currentInstallation.channels = ["global"]
-        currentInstallation.saveInBackground()
-    }
-    
-    func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
-        PFPush.handlePush(userInfo)
-    }
-    
 }
 
