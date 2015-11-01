@@ -1,77 +1,77 @@
 html, body {
-	height: 100%;
+    height: 100%;
 }
 
 body {
-	margin: 0px;
-	padding: 0px;
-	font-family: 'Open Sans', sans-serif;
-	font-size: 10pt;
-	color: #747474;
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 10pt;
+    color: #747474;
 }
 
 
 h1, h2, h3 {
-	margin: 0;
-	padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 p, ol, ul {
-	margin-top: 0px;
+    margin-top: 0px;
 }
 
 p {
-	line-height: 180%;
+    line-height: 180%;
 }
 
 strong {
 }
 
 a {
-	color: #706C53;
+    color: #706C53;
 }
 
 a:hover {
-	text-decoration: none;
+    text-decoration: none;
 }
 
 a img {
-	border: none;
+    border: none;
 }
 
 .clearfix {
-	clear: both;
+    clear: both;
 }
 
 
 /** PAGE */
 
 #page {
-	overflow: hidden;
-	margin-bottom: 3em;
-	padding: 30px 30px;
-	background: #FFF;
+    overflow: hidden;
+    margin-bottom: 3em;
+    padding: 30px 30px;
+    background: #FFF;
 }
 
 
 #box {
-	float: left;
-	margin-right: 50px;
+    float: left;
+    margin-right: 50px;
 }
 
 /* Footer */
 
 #footer {
-	overflow: hidden;
-	padding: 3em 0em;
-	border-top: 1px solid #D9D2A5;
-	color: #7A7762;
+    overflow: hidden;
+    padding: 3em 0em;
+    border-top: 1px solid #D9D2A5;
+    color: #7A7762;
 }
 
 #footer p {
-	text-align: center;
+    text-align: center;
 }
 
 #footer a {
-	color: #7A7762;
+    color: #7A7762;
 }
