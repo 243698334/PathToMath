@@ -19,13 +19,12 @@ class PMGuestStartGameView: UIView, UITableViewDataSource, UITableViewDelegate {
     
     private let kTitleLabelHeight = CGFloat(30)
     private let kButtonHeight = CGFloat(50)
-    private let kHorizontaladding = CGFloat(40)
+    private let kHorizontalPadding = CGFloat(40)
     private let kVerticalPadding = CGFloat(10)
     private let kSummaryLabelTopMargin = CGFloat(70)
     
     private let gameModes = [kPMGameModeApproximate, kPMGameModeExact, kPMGameModeAbacus, kPMGameModeNumbers, kPMGameModeAPlusB]
 
-    
     weak var delegate: PMGuestStartGameViewDelegate?
     
     private var titleLabel: UILabel!
@@ -34,6 +33,7 @@ class PMGuestStartGameView: UIView, UITableViewDataSource, UITableViewDelegate {
     private var startButton: UIButton!
     private var selectGameModeTableView: UITableView!
     private var startButtonActivityIndicatorView: UIActivityIndicatorView!
+    private var guestModeInfoLabel: UILabel!
     
     private var selectedGameMode: String!
     
@@ -47,14 +47,14 @@ class PMGuestStartGameView: UIView, UITableViewDataSource, UITableViewDelegate {
     }
     
     override func drawRect(rect: CGRect) {
-        self.titleLabel = UILabel(frame: CGRect(x: kHorizontaladding, y: kSummaryLabelTopMargin, width: rect.width - 2 * kHorizontaladding, height: kTitleLabelHeight))
+        self.titleLabel = UILabel(frame: CGRect(x: kHorizontalPadding, y: kSummaryLabelTopMargin, width: rect.width - 2 * kHorizontalPadding, height: kTitleLabelHeight))
         self.titleLabel.textAlignment = .Center
         self.titleLabel.textColor = UIColor.whiteColor()
         self.titleLabel.font = UIFont.systemFontOfSize(14.0)
         self.titleLabel.text = "Select a game mode to start"
         self.addSubview(self.titleLabel)
         
-        self.selectGameModeButton = UIButton(frame: CGRect(x: kHorizontaladding, y: CGRectGetMaxY(self.titleLabel.frame) + kVerticalPadding, width: rect.width - 2 * kHorizontaladding, height: kButtonHeight))
+        self.selectGameModeButton = UIButton(frame: CGRect(x: kHorizontalPadding, y: CGRectGetMaxY(self.titleLabel.frame) + kVerticalPadding, width: rect.width - 2 * kHorizontalPadding, height: kButtonHeight))
         self.selectGameModeButton.setTitle("select game mode", forState: .Normal)
         self.selectGameModeButton.layer.cornerRadius = 5
         self.selectGameModeButton.layer.masksToBounds = true
@@ -67,7 +67,7 @@ class PMGuestStartGameView: UIView, UITableViewDataSource, UITableViewDelegate {
         self.selectGameModeButton.addSubview(selectGameModeButtonDropdownIconLabel)
         self.addSubview(self.selectGameModeButton)
         
-        self.backButton = UIButton(frame: CGRect(x: kHorizontaladding, y: CGRectGetMaxY(self.selectGameModeButton.frame) + kVerticalPadding, width: rect.width / 2 - kHorizontaladding - kVerticalPadding / 2, height: kButtonHeight))
+        self.backButton = UIButton(frame: CGRect(x: kHorizontalPadding, y: CGRectGetMaxY(self.selectGameModeButton.frame) + kVerticalPadding, width: rect.width / 2 - kHorizontalPadding - kVerticalPadding / 2, height: kButtonHeight))
         self.backButton.setTitle("back", forState: .Normal)
         self.backButton.layer.cornerRadius = 5
         self.backButton.layer.masksToBounds = true
@@ -76,7 +76,7 @@ class PMGuestStartGameView: UIView, UITableViewDataSource, UITableViewDelegate {
         self.backButton.addTarget(self, action: "didTapBackButton:", forControlEvents: .TouchUpInside)
         self.addSubview(self.backButton)
         
-        self.startButton = UIButton(frame: CGRect(x: (rect.width + kVerticalPadding) / 2.0, y: CGRectGetMaxY(self.selectGameModeButton.frame) + kVerticalPadding, width: rect.width / 2 - kHorizontaladding - kVerticalPadding / 2, height: kButtonHeight))
+        self.startButton = UIButton(frame: CGRect(x: (rect.width + kVerticalPadding) / 2.0, y: CGRectGetMaxY(self.selectGameModeButton.frame) + kVerticalPadding, width: rect.width / 2 - kHorizontalPadding - kVerticalPadding / 2, height: kButtonHeight))
         self.startButton.setTitle("start", forState: .Normal)
         self.startButton.layer.cornerRadius = 5
         self.startButton.layer.masksToBounds = true
@@ -84,6 +84,14 @@ class PMGuestStartGameView: UIView, UITableViewDataSource, UITableViewDelegate {
         self.startButton.contentVerticalAlignment = .Center
         self.startButton.addTarget(self, action: "didTapStartButton:", forControlEvents: .TouchUpInside)
         self.addSubview(self.startButton)
+        
+        self.guestModeInfoLabel = UILabel(frame: CGRect(x: kHorizontalPadding, y: CGRectGetMaxY(self.backButton.frame) + kVerticalPadding, width: rect.width - 2 * kHorizontalPadding, height: kButtonHeight))
+        self.guestModeInfoLabel.textAlignment = .Center
+        self.guestModeInfoLabel.textColor = UIColor.whiteColor()
+        self.guestModeInfoLabel.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
+        self.guestModeInfoLabel.numberOfLines = 0
+        self.guestModeInfoLabel.text = "You can try the first level problem set in the game mode you choose without logging in."
+        self.addSubview(self.guestModeInfoLabel)
     }
     
     func didTapSelectGameModeButton(button: UIButton) {
