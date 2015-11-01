@@ -56,7 +56,6 @@
 		0E34A7381BD6FDFB009EF978 /* WalkMarimba.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0E34A7331BD6FDFB009EF978 /* WalkMarimba.wav */; };
 		0E34A7391BD6FDFB009EF978 /* WrongPwet.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0E34A7341BD6FDFB009EF978 /* WrongPwet.wav */; };
 		0E59EC3B1BD757D7004C685E /* NowPutThe.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0E59EC3A1BD757D7004C685E /* NowPutThe.wav */; };
-		0E59EC3E1BD78D14004C685E /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E59EC3D1BD78D14004C685E /* Reachability.m */; };
 		0E6578B91BD61E4600524473 /* PMAbacusGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E65789C1BD61E4600524473 /* PMAbacusGameViewController.swift */; };
 		0E6578BA1BD61E4600524473 /* PMAPlusBGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E65789D1BD61E4600524473 /* PMAPlusBGameViewController.swift */; };
 		0E6578BB1BD61E4600524473 /* PMApproximateGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E65789E1BD61E4600524473 /* PMApproximateGameViewController.swift */; };
@@ -150,8 +149,6 @@
 		0E34A7331BD6FDFB009EF978 /* WalkMarimba.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = WalkMarimba.wav; sourceTree = "<group>"; };
 		0E34A7341BD6FDFB009EF978 /* WrongPwet.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = WrongPwet.wav; sourceTree = "<group>"; };
 		0E59EC3A1BD757D7004C685E /* NowPutThe.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = NowPutThe.wav; sourceTree = "<group>"; };
-		0E59EC3C1BD78D14004C685E /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
-		0E59EC3D1BD78D14004C685E /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		0E65789C1BD61E4600524473 /* PMAbacusGameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PMAbacusGameViewController.swift; sourceTree = "<group>"; };
 		0E65789D1BD61E4600524473 /* PMAPlusBGameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PMAPlusBGameViewController.swift; sourceTree = "<group>"; };
 		0E65789E1BD61E4600524473 /* PMApproximateGameViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PMApproximateGameViewController.swift; sourceTree = "<group>"; };
@@ -358,8 +355,6 @@
 		0E6578AD1BD61E4600524473 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				0E59EC3C1BD78D14004C685E /* Reachability.h */,
-				0E59EC3D1BD78D14004C685E /* Reachability.m */,
 				0E6578AE1BD61E4600524473 /* PMAppSession.swift */,
 				0E65792D1BD6224F00524473 /* PMAudioPlayer.swift */,
 			);
@@ -671,7 +666,6 @@
 				0E6578C91BD61E4600524473 /* PMEndOfGameSessionView.swift in Sources */,
 				0E6578CB1BD61E4600524473 /* PMGameView.swift in Sources */,
 				0E6578C31BD61E4600524473 /* PMProblemResponse.swift in Sources */,
-				0E59EC3E1BD78D14004C685E /* Reachability.m in Sources */,
 				0E6578C71BD61E4600524473 /* PMAppSession.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -210,10 +210,10 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     }
     
     private func checkForUpdatesInBackground() {
-        if (self.internetReachability.currentReachabilityStatus() == NotReachable) {
-            let networkAlertBannerView = PMAlertBannerView(style: .Warning)
+        if (self.internetReachability.currentReachabilityStatus() == .NotReachable) {
+            let networkAlertBannerView = PMAlertBannerView(style: .Info)
             networkAlertBannerView.titleLabel.text = "No Internet connection, but no worries"
-            networkAlertBannerView.detailTextLabel.text = "We suggest you to go online so we can download the latest problems and upload your progress and performance.\nBut for now, everything will be saved on this device."
+            networkAlertBannerView.detailTextLabel.text = "Try to go online so we can sync the latest problems, your progress and performance.\nBut for now, everything will be saved on this device."
             self.showAlertBannerView(networkAlertBannerView, duration: 8.0, animated: true)
         } else {
             let sharedDataLocalQuery = PMSharedData.query()
@@ -243,7 +243,7 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
                                 if (problems != nil && error == nil) {
                                     let problems = problems as? [PMProblem]
                                     PMProblem.unpinAllObjectsInBackgroundWithName(kPMLocalDatastoreProblemPinName, block: { (unpinSuccess: Bool, unpinError: NSError?) -> Void in
-                                        PMProblem.pinAllInBackground(problems, block: { (unpinSuccess: Bool, unpinError: NSError?) -> Void in
+                                        PMProblem.pinAllInBackground(problems, withName: kPMLocalDatastoreProblemPinName, block: { (unpinSuccess: Bool, unpinError: NSError?) -> Void in
                                             self.dismissViewControllerAnimated(true, completion: nil)
                                         })
                                     })
@@ -258,7 +258,7 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     
     private func loadGameProgressInBackground(completion: ((success: Bool, gameProgress: PMGameProgress?) -> Void)?) {
         self.internetReachability.startNotifier()
-        if (internetReachability.currentReachabilityStatus() == NotReachable) {
+        if (internetReachability.currentReachabilityStatus() == .NotReachable) {
             let localGameProgressQuery = PMGameProgress.query()
             localGameProgressQuery?.fromPinWithName(kPMLocalDatastoreGameProgressPinName)
             localGameProgressQuery?.whereKey(kPMGameProgressUserKey, equalTo: PMUser.currentUser()!)
@@ -309,19 +309,28 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     
     private func loadProblemsInBackgroundWithGameProgress(gameProgress: PMGameProgress, completion: ((success: Bool, problems: [PMProblem]?) -> Void)?) {
         let localProblemsQuery = PMProblem.query()
-        localProblemsQuery?.limit = 15
+        //localProblemsQuery?.limit = 15
         localProblemsQuery?.fromPinWithName(kPMLocalDatastoreProblemPinName)
         localProblemsQuery?.whereKey(kPMProblemLevelKey, equalTo: gameProgress.level)
         localProblemsQuery?.findObjectsInBackgroundWithBlock({ (localProblems: [PFObject]?, localError: NSError?) -> Void in
             if (localError == nil && localProblems?.count != 0) {
                 completion?(success: true, problems: localProblems as? [PMProblem])
             } else {
+                if (self.internetReachability.currentReachabilityStatus() == .NotReachable) {
+                    completion?(success: false, problems: nil)
+                    return
+                }
                 let remoteProblemsQuery = PMProblem.query()
                 remoteProblemsQuery?.limit = 15
                 remoteProblemsQuery?.whereKey(kPMProblemLevelKey, equalTo: gameProgress.level)
                 remoteProblemsQuery?.findObjectsInBackgroundWithBlock({ (remoteProblems: [PFObject]?, remoteError: NSError?) -> Void in
                     if (remoteError == nil && remoteProblems?.count != 0) {
-                        completion?(success: true, problems: remoteProblems as? [PMProblem])
+                        let remoteProblems = remoteProblems as? [PMProblem]
+                        PMProblem.unpinAllObjectsInBackgroundWithName(kPMLocalDatastoreProblemPinName, block: { (unpinSuccess: Bool, unpinError: NSError?) -> Void in
+                            PMProblem.pinAllInBackground(remoteProblems, withName: kPMLocalDatastoreProblemPinName, block: { (unpinSuccess: Bool, unpinError: NSError?) -> Void in
+                                completion?(success: true, problems: remoteProblems)
+                            })
+                        })
                     } else {
                         completion?(success: false, problems: nil)
                     }
@@ -360,7 +369,7 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
         self.presentViewController(legalInfoViewController, animated: true, completion: nil)
         
         let sharedDataQuery = PMSharedData.query()
-        if (self.internetReachability.currentReachabilityStatus() == NotReachable) {
+        if (self.internetReachability.currentReachabilityStatus() == .NotReachable) {
             sharedDataQuery?.fromPinWithName(kPMLocalDatastoreSharedDataPinName)
         }
         sharedDataQuery?.whereKey(kPMSharedDataKeyKey, equalTo: kPMSharedDataLegalInfoPageURLKeyKey)
@@ -391,15 +400,15 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
             break
         default:
             let sharedDataQuery = PMSharedData.query()
-            if (self.internetReachability.currentReachabilityStatus() == NotReachable) {
+            if (self.internetReachability.currentReachabilityStatus() == .NotReachable) {
                 sharedDataQuery?.fromPinWithName(kPMLocalDatastoreSharedDataPinName)
             }
             sharedDataQuery?.whereKey(kPMSharedDataKeyKey, containedIn: [kPMSharedDataSupportContactNameKeyKey, kPMSharedDataSupportContactEmailKeyKey])
             sharedDataQuery?.findObjectsInBackgroundWithBlock({ (sharedDatas: [PFObject]?, error: NSError?) -> Void in
                 if (sharedDatas != nil && error == nil) {
                     let sharedDatas = sharedDatas as! [PMSharedData]
-                    if (self.internetReachability.currentReachabilityStatus() != NotReachable) {
-                        PMSharedData.pinAllInBackground(sharedDatas)
+                    if (self.internetReachability.currentReachabilityStatus() != .NotReachable) {
+                        PMSharedData.pinAllInBackground(sharedDatas, withName: kPMLocalDatastoreSharedDataPinName)
                     }
                     var supportContactName: String!, supportContactEmail: String!
                     for currentSharedData in sharedDatas {
@@ -535,12 +544,15 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     
     func reachabilityDidChange(notification: NSNotification) {
         let reachability = notification.object as! Reachability
-        if (reachability.currentReachabilityStatus() == NotReachable) {
+        if (reachability.currentReachabilityStatus() == .NotReachable) {
             let reachabilityAlertBannerView = PMAlertBannerView(style: .Warning)
             reachabilityAlertBannerView.titleLabel.text = "You have been disconnected"
             reachabilityAlertBannerView.detailTextLabel.text = "Your responses and progress will be saved locally until you are connected to the Internet again."
             self.showAlertBannerView(reachabilityAlertBannerView, duration: 5.0, animated: true)
         } else {
+            if (PMUser.currentUser() == nil || PFAnonymousUtils.isLinkedWithUser(PFUser.currentUser()) == true) {
+                return
+            }
             let localGameProgressQuery = PMGameProgress.query()
             localGameProgressQuery?.fromPinWithName(kPMLocalDatastoreGameProgressPinName)
             localGameProgressQuery?.whereKey(kPMGameProgressUserKey, equalTo: PMUser.currentUser()!)
@@ -597,21 +609,21 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     func loginView(loginView: PMLoginView, didTapForgotPasswordButtonWithUsername username: String) {
         self.view.endEditing(true)
         
-        if (self.internetReachability.currentReachabilityStatus() == NotReachable) {
+        if (self.internetReachability.currentReachabilityStatus() == .NotReachable) {
             let forgotPasswordAlertController = UIAlertController(title: "Need help with password?", message: "Please contact the Department of Psychology for more support.", preferredStyle: .Alert)
             forgotPasswordAlertController.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
             self.presentViewController(forgotPasswordAlertController, animated: true, completion: nil)
         } else {
             let sharedDataQuery = PMSharedData.query()
-            if (self.internetReachability.currentReachabilityStatus() == NotReachable) {
+            if (self.internetReachability.currentReachabilityStatus() == .NotReachable) {
                 sharedDataQuery?.fromPinWithName(kPMLocalDatastoreSharedDataPinName)
             }
             sharedDataQuery?.whereKey(kPMSharedDataKeyKey, containedIn: [kPMSharedDataSupportContactNameKeyKey, kPMSharedDataSupportContactEmailKeyKey])
             sharedDataQuery?.findObjectsInBackgroundWithBlock({ (sharedDatas: [PFObject]?, error: NSError?) -> Void in
                 if (sharedDatas != nil && error == nil) {
                     let sharedDatas = sharedDatas as! [PMSharedData]
-                    if (self.internetReachability.currentReachabilityStatus() != NotReachable) {
-                        PMSharedData.pinAllInBackground(sharedDatas)
+                    if (self.internetReachability.currentReachabilityStatus() != .NotReachable) {
+                        PMSharedData.pinAllInBackground(sharedDatas, withName: kPMLocalDatastoreSharedDataPinName)
                     }
                     var supportContactName: String!, supportContactEmail: String!
                     for currentSharedData in sharedDatas {
@@ -662,8 +674,10 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     // MARK: StartGameViewDelegate
     
     func didTapStartButtonInStartGameView(startGameView: PMStartGameView) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
-            self.showLoadingViewAnimated(true)
+        if (internetReachability.currentReachabilityStatus() != .NotReachable) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+                self.showLoadingViewAnimated(true)
+            }
         }
         self.loadGameProgressInBackground { (success: Bool, gameProgress: PMGameProgress?) -> Void in
             if (success == true) {
@@ -687,7 +701,9 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
                 }))
                 self.presentViewController(errorMessageAlertController, animated: true, completion: nil)
             }
-            self.hideLoadingViewAnimated(true)
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+                self.hideLoadingViewAnimated(true)
+            }
         }
     }
     

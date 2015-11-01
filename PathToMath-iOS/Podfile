@@ -3,6 +3,7 @@
 
 target 'PathToMath' do
   pod 'Parse'
+  pod 'Reachability'
 end
 
 target 'PathToMathTests' do
