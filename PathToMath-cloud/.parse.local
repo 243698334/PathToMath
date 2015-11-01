@@ -1,7 +1,7 @@
 {
   "applications": {
     "PathToMath": {
-      "applicationId": "wlKTTQ2IZG8zL14xyLb34skq6J55tYl3wWXrf3HT"
+      "applicationId": "APPLICATION_ID"
     },
     "_default": {
       "link": "PathToMath"
