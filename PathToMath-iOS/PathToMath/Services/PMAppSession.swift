@@ -11,7 +11,7 @@ class PMAppSession: PFSession {
     static var appSessionLog: PMAppSessionLog?
     
     class func applicationDidBecomeActive() {
-        if (PMUser.currentUser() == nil) {
+        if (PMUser.currentUser() == nil || PFAnonymousUtils.isLinkedWithUser(PFUser.currentUser()) == true) {
             self.appSessionLog = nil
             return
         }

@@ -28,6 +28,7 @@ class PMLegalInfoViewController: UIViewController {
         self.topBarView.addSubview(self.doneButton)
         
         self.webView = UIWebView()
+        self.webView.multipleTouchEnabled = false
         self.view.addSubview(self.webView)
     }
     

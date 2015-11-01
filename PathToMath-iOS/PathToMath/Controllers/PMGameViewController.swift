@@ -42,6 +42,7 @@ class PMGameViewController: UIViewController, PMProgressSummaryViewDataSource, P
     var sessionPerformance: PMSessionPerformance!
     var cloudInteractionCount: Int!
     
+    private var isCurrentUserAnonymous: Bool!
     private var progressSummaryView: PMProgressSummaryView!
     private var gameInstructionView: PMGameInstructionView!
     private var gameView: PMGameView!
@@ -126,10 +127,12 @@ class PMGameViewController: UIViewController, PMProgressSummaryViewDataSource, P
         self.hideSideMenuButton.alpha = 0
         self.view.addSubview(self.hideSideMenuButton)
         
-        PMAppSession.loadTimePlayedTodayInBackground { (timePlayedToday: NSTimeInterval) -> Void in
-            let hoursPlayed = Int(timePlayedToday / 3600.0)
-            let minutesPlayed = Int((timePlayedToday - Double(hoursPlayed * 3600)) / 60.0)
-            self.sideMenuView.updateTimePlayedLabelWithHoursPlayed(hoursPlayed, minutesPlayed: minutesPlayed)
+        if (self.isCurrentUserAnonymous == false) {
+            PMAppSession.loadTimePlayedTodayInBackground { (timePlayedToday: NSTimeInterval) -> Void in
+                let hoursPlayed = Int(timePlayedToday / 3600.0)
+                let minutesPlayed = Int((timePlayedToday - Double(hoursPlayed * 3600)) / 60.0)
+                self.sideMenuView.updateTimePlayedLabelWithHoursPlayed(hoursPlayed, minutesPlayed: minutesPlayed)
+            }
         }
         
         if (animated == true) {
@@ -285,6 +288,8 @@ class PMGameViewController: UIViewController, PMProgressSummaryViewDataSource, P
     // MARK: Game States
     
     private func didStartCurrentSession() {
+        self.isCurrentUserAnonymous = PFAnonymousUtils.isLinkedWithUser(PMUser.currentUser())
+        
         self.loadItemForCurrentGameSession()
         self.loadProgressSummaryView()
         self.loadGameInstructionView()
@@ -293,15 +298,22 @@ class PMGameViewController: UIViewController, PMProgressSummaryViewDataSource, P
         
         self.showView(self.progressSummaryView, animated: true, completion: nil)
         
-        self.sessionPerformance = PMSessionPerformance()
-        self.sessionPerformance.user = PMUser.currentUser()
-        self.sessionPerformance.level = self.gameProgress.level
-        self.sessionPerformance.totalProblems = self.problems.count
-        self.sessionPerformance.responses = [PMProblemResponse]()
+        if (self.isCurrentUserAnonymous == false) {
+            self.sessionPerformance = PMSessionPerformance()
+            self.sessionPerformance.user = PMUser.currentUser()
+            self.sessionPerformance.level = self.gameProgress.level
+            self.sessionPerformance.totalProblems = self.problems.count
+            self.sessionPerformance.responses = [PMProblemResponse]()
+        }
+
         self.cloudInteractionCount = 0
     }
     
     private func didFinishCurrentSession() {
+        if (self.isCurrentUserAnonymous == true) {
+            return
+        }
+        
         PMProblemResponse.saveAllInBackground(self.problemResponses, block: { (success: Bool, error: NSError?) -> Void in
             if (success == false || error != nil) {
                 for currentProblemResponse in self.problemResponses {
@@ -340,9 +352,11 @@ class PMGameViewController: UIViewController, PMProgressSummaryViewDataSource, P
             NSUserDefaults.standardUserDefaults().setBool(true, forKey: kPMUserDefaultsHasShownInteractionHintForCurrentGameMode)
         }
         
-        self.currentProblemResponse = PMProblemResponse()
-        self.currentProblemResponse.problem = self.problems[self.currentProblemIndex]
-        self.currentProblemResponse.gameMode = self.gameProgress.mode
+        if (self.isCurrentUserAnonymous == false) {
+            self.currentProblemResponse = PMProblemResponse()
+            self.currentProblemResponse.problem = self.problems[self.currentProblemIndex]
+            self.currentProblemResponse.gameMode = self.gameProgress.mode
+        }
     }
     
     func startInteractionInGameView(gameView: PMGameView) {
@@ -354,7 +368,10 @@ class PMGameViewController: UIViewController, PMProgressSummaryViewDataSource, P
             self.showInteractionHintOverlayOnBasketInGameView(self.gameView)
         }
         self.playChooseBasketHintAudioWithCompletion(nil)
-        self.currentProblemResponse.startTimestamp = NSDate()
+        
+        if (self.isCurrentUserAnonymous == false) {
+            self.currentProblemResponse.startTimestamp = NSDate()
+        }
     }
     
     func startFeedbackInGameView(gameView: PMGameView, selectedBasketPosition: PMGameViewBasketPosition, correctness: Bool) {
@@ -413,15 +430,17 @@ class PMGameViewController: UIViewController, PMProgressSummaryViewDataSource, P
         }
         self.startFeedbackInGameView(self.gameView, selectedBasketPosition: selection, correctness: correctness)
         
-        self.currentProblemResponse.finishTimestamp = NSDate()
-        self.currentProblemResponse.timeElapsed = NSDate().timeIntervalSinceDate(self.currentProblemResponse.startTimestamp)
-        self.currentProblemResponse.correct = correctness
-        if (correctness == true) {
-            self.sessionPerformance.correctProblems++
-        } else {
-            self.sessionPerformance.incorrectProblems++
+        if (self.isCurrentUserAnonymous == false) {
+            self.currentProblemResponse.finishTimestamp = NSDate()
+            self.currentProblemResponse.timeElapsed = NSDate().timeIntervalSinceDate(self.currentProblemResponse.startTimestamp)
+            self.currentProblemResponse.correct = correctness
+            if (correctness == true) {
+                self.sessionPerformance.correctProblems++
+            } else {
+                self.sessionPerformance.incorrectProblems++
+            }
+            self.sessionPerformance.responses.append(self.currentProblemResponse)
         }
-        self.sessionPerformance.responses.append(self.currentProblemResponse)
     }
     
     func didReceiveCloudInteraction(cloudPosition: PMGameViewCloudPosition, inGameView gameView: PMGameView) {

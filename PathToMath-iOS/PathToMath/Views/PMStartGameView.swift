@@ -36,7 +36,7 @@ class PMStartGameView: UIView {
         self.summaryLabel = UILabel(frame: .zero)
         self.startButton = UIButton(frame: .zero)
         self.logoutButton = UIButton(frame: .zero)
-        self.logoutButtonActivityIndicatorView = UIActivityIndicatorView()
+        self.logoutButtonActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
         
         self.backgroundColor = .clearColor()
     }

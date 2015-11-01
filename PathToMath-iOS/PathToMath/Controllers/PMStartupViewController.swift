@@ -9,7 +9,7 @@
 import UIKit
 import MessageUI
 
-class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginViewDelegate, PMStartGameViewDelegate, MFMailComposeViewControllerDelegate {
+class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginViewDelegate, PMStartGameViewDelegate, PMGuestStartGameViewDelegate, MFMailComposeViewControllerDelegate {
     
     private var backgroundImageView: UIImageView!
     private var logoImage: UIImage!
@@ -19,6 +19,7 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     private var loginView: PMLoginView!
     private var startGameView: PMStartGameView!
     private var loadingView: PMLoadingView!
+    private var guestStartGameView: PMGuestStartGameView!
     
     private var subviewsMovedUpForKeyboardShow : Bool!
     private var subviewsLoaded: Bool!
@@ -82,14 +83,14 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         
-        if (self.subviewsLoaded == true && PMUser.currentUser() != nil) {
+        if (self.subviewsLoaded == true && (PMUser.currentUser() != nil && PFAnonymousUtils.isLinkedWithUser(PFUser.currentUser()) == false)) {
             self.updateTimePlayedToday()
             self.checkForUpdatesInBackground()
             return
         }
         
         self.showGameLogo({ () -> Void in
-            if (PMUser.currentUser() == nil) {
+            if (PMUser.currentUser() == nil || PFAnonymousUtils.isLinkedWithUser(PFUser.currentUser()) == true) {
                 self.showLoginView(nil)
             } else {
                 self.showStartGameView({ () -> Void in
@@ -113,8 +114,12 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     }
     
     private func showLoginView(completion: ((Void) -> Void)?) {
+        if (self.guestStartGameView != nil) {
+            self.guestStartGameView.removeFromSuperview()
+            self.guestStartGameView = nil
+        }
         self.loginView.alpha = 0.0
-        self.loginView.frame = CGRect(x: self.view.bounds.width / 3, y: 350, width: self.view.bounds.width / 3, height: 260)
+        self.loginView.frame = CGRect(x: self.view.bounds.width / 3, y: 350, width: self.view.bounds.width / 3, height: 320)
         self.view.addSubview(self.loginView)
 
         UIView.animateWithDuration(0.5, animations: { () -> Void in
@@ -128,7 +133,7 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     
     private func showStartGameView(completion: ((Void) -> Void)?) {
         self.startGameView.alpha = 0.0
-        self.startGameView.frame = CGRect(x: self.view.bounds.width / 3, y: 350, width: self.view.bounds.width / 3, height: 220)
+        self.startGameView.frame = CGRect(x: self.view.bounds.width / 3, y: 350, width: self.view.bounds.width / 3, height: 320)
         self.view.addSubview(self.startGameView)
         
         UIView.animateWithDuration(0.5, animations: { () -> Void in
@@ -140,36 +145,27 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
         }
     }
     
-    private func transitFromLoginViewToStartGameView(completion: ((Void) -> Void)?) {
-        let loginViewFrame = self.loginView.frame
-        self.startGameView.frame = CGRectMake(self.view.bounds.width, loginViewFrame.origin.y, loginViewFrame.width, loginViewFrame.height)
-        self.view.addSubview(self.startGameView)
-        self.view.bringSubviewToFront(self.startGameView)
+    private func transitionFromView(fromView: UIView, toView: UIView, forward: Bool, completion: (() -> Void)?) {
+        let fromViewFrame = fromView.frame
+        if (forward == true) {
+            toView.frame = CGRect(x: self.view.bounds.width, y: fromViewFrame.origin.y, width: fromViewFrame.width, height: fromViewFrame.height)
+        } else {
+            toView.frame = CGRect(x: -fromViewFrame.width, y: fromViewFrame.origin.y, width: fromViewFrame.width, height: fromViewFrame.height)
+        }
+        self.view.addSubview(toView)
+        self.view.bringSubviewToFront(toView)
         
         UIView.animateWithDuration(0.5, delay: 0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
-            self.loginView.center = CGPointMake(-self.loginView.frame.width / 2, self.loginView.center.y)
-            self.startGameView.frame = loginViewFrame
-        }, completion: { finished in
-            if (finished) {
-                completion?()
-                self.loginView.removeFromSuperview()
+            if (forward == true) {
+                fromView.center = CGPoint(x: -fromView.frame.width / 2, y: fromView.center.y)
+            } else {
+                fromView.center = CGPoint(x: self.view.bounds.width + fromView.frame.width / 2, y: fromView.center.y)
             }
-        })
-    }
-    
-    private func transitFromStartGameViewToLoginView(completion: ((Void) -> Void)?) {
-        let startGameViewFrame = self.startGameView.frame
-        self.loginView.frame = CGRect(x: -startGameViewFrame.width, y: startGameViewFrame.origin.y, width: startGameViewFrame.width, height: startGameViewFrame.height)
-        self.view.addSubview(self.loginView)
-        self.view.bringSubviewToFront(self.loginView)
-        
-        UIView.animateWithDuration(0.5, delay: 0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
-            self.startGameView.center = CGPointMake(self.view.bounds.width + self.startGameView.frame.width / 2, self.startGameView.center.y)
-            self.loginView.frame = startGameViewFrame
+            toView.frame = fromViewFrame
         }, completion: { finished in
             if (finished) {
                 completion?()
-                self.startGameView.removeFromSuperview()
+                fromView.removeFromSuperview()
             }
         })
     }
@@ -181,7 +177,7 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
             if (user != nil) {
                 NSUserDefaults.standardUserDefaults().setObject(user?.username, forKey: kPMUserDefaultsLastUsernameKey)
                 PMAppSession.userDidLogin()
-                self.transitFromLoginViewToStartGameView({ () -> Void in
+                self.transitionFromView(self.loginView, toView: self.startGameView, forward: true, completion: { () -> Void in
                     self.updateTimePlayedToday()
                     self.checkForUpdatesInBackground()
                 })
@@ -200,7 +196,7 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
             if (error == nil) {
                 PMAppSession.userDidLogout()
                 self.startGameView.stopLogoutActivityIndicatorAnimation()
-                self.transitFromStartGameViewToLoginView(nil)
+                self.transitionFromView(self.startGameView, toView: self.loginView, forward: false, completion: nil)
             }
         }
     }
@@ -650,10 +646,11 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     }
     
     func didTapGuestButtonInLoginView(loginView: PMLoginView) {
-        
+        self.guestStartGameView = PMGuestStartGameView(frame: .zero)
+        self.guestStartGameView.delegate = self
+        self.transitionFromView(self.loginView, toView: self.guestStartGameView, forward: true, completion: nil)
     }
     
-
 
     // MARK: MFMailComposeViewControllerDelegate
     
@@ -703,4 +700,34 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
         self.presentViewController(logoutAlertController, animated: true, completion: nil)
     }
     
+    
+    // MARK: PMGuestStartGameViewDelegate
+    
+    func guestStartGameView(guestStartGameView: PMGuestStartGameView, didTapStartButtonWithGameMode gameMode: String) {
+        self.guestStartGameView.startStartButtonActivityIndicatorAnimation()
+        PMUser.enableAutomaticUser()
+        PMUser.currentUser()?.displayName = "Guest"
+        PMUser.currentUser()?.age = 0
+        let gameProgress = PMGameProgress()
+        gameProgress.level = 1
+        gameProgress.mode = gameMode
+        gameProgress.user = PMUser.currentUser()
+        self.loadProblemsInBackgroundWithGameProgress(gameProgress, completion: { (success: Bool, problems: [PMProblem]?) -> Void in
+            if (success == true) {
+                self.presentGameViewControllerWithGameProgress(gameProgress, problems: problems!)
+            } else {
+                let errorMessageAlertController = UIAlertController(title: "Failed to load problems", message: "Sorry about this but we need to load the problems before the game. Please retry or contact support.", preferredStyle: .Alert)
+                errorMessageAlertController.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+                errorMessageAlertController.addAction(UIAlertAction(title: "Retry", style: .Default, handler: { (retryAction) -> Void in
+                    self.didTapStartButtonInStartGameView(self.startGameView)
+                }))
+                self.presentViewController(errorMessageAlertController, animated: true, completion: nil)
+            }
+            self.guestStartGameView.stopStartButtonActivityIndicatorAnimation()
+        })
+    }
+    
+    func didTapBackButtonInGuestStartGameView(guestStartGameView: PMGuestStartGameView) {
+        self.transitionFromView(self.guestStartGameView, toView: self.loginView, forward: false, completion: nil)
+    }
 }
