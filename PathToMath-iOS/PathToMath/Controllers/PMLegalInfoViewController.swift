@@ -16,7 +16,9 @@ class PMLegalInfoViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        self.view.backgroundColor = UIColor.whiteColor()
+        
         self.topBarView = UIView()
         self.topBarView.backgroundColor = UIColor.whiteColor()
         self.view.addSubview(self.topBarView)
@@ -28,7 +30,7 @@ class PMLegalInfoViewController: UIViewController {
         self.topBarView.addSubview(self.doneButton)
         
         self.webView = UIWebView()
-        self.webView.multipleTouchEnabled = false
+        self.webView.backgroundColor = UIColor.whiteColor()
         self.view.addSubview(self.webView)
     }
     
@@ -46,6 +48,7 @@ class PMLegalInfoViewController: UIViewController {
     
     func loadLegalInfoPageWithURLString(legalInfoPageURLString: String) {
         self.webView.loadRequest(NSURLRequest(URL: NSURL(string: legalInfoPageURLString)!))
+        self.webView.multipleTouchEnabled = false
     }
 
 }
