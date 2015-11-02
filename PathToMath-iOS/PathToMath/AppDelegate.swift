@@ -29,6 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Parse.setApplicationId("APPLICATION_ID_PLACEHOLDER", clientKey: "CLIENT_KEY_PLACEHOLDER")
         PFUser.enableRevocableSessionInBackground()
         
+        application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Alert, .Badge, .Sound], categories: nil))
         application.registerForRemoteNotifications()
         
         self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
@@ -44,6 +45,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(application: UIApplication) {
         PMAppSession.applicationDidBecomeActive()
+    }
+    
+    func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {
+        let currentInstallation = PFInstallation.currentInstallation()
+        currentInstallation.setDeviceTokenFromData(deviceToken)
+        currentInstallation.channels = ["global"]
+        currentInstallation.saveInBackground()
+    }
+    
+    func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
+        PFPush.handlePush(userInfo)
     }
     
 }
