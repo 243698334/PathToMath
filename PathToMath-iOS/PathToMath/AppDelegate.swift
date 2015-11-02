@@ -29,9 +29,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Parse.setApplicationId("APPLICATION_ID_PLACEHOLDER", clientKey: "CLIENT_KEY_PLACEHOLDER")
         PFUser.enableRevocableSessionInBackground()
         
-        application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Alert, .Badge, .Sound], categories: nil))
-        application.registerForRemoteNotifications()
-        
         self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
         self.window?.rootViewController = PMStartupViewController()
         self.window?.makeKeyAndVisible();

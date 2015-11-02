@@ -177,6 +177,8 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
             if (user != nil) {
                 NSUserDefaults.standardUserDefaults().setObject(user?.username, forKey: kPMUserDefaultsLastUsernameKey)
                 PMAppSession.userDidLogin()
+                UIApplication.sharedApplication().registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Alert, .Badge, .Sound], categories: nil))
+                UIApplication.sharedApplication().registerForRemoteNotifications()
                 self.transitionFromView(self.loginView, toView: self.startGameView, forward: true, completion: { () -> Void in
                     self.updateTimePlayedToday()
                     self.checkForUpdatesInBackground()
