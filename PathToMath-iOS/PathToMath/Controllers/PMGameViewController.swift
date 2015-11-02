@@ -56,6 +56,7 @@ class PMGameViewController: UIViewController, PMProgressSummaryViewDataSource, P
         self.didStartCurrentSession()
     }
     
+    
     // MARK: View Initializers
     
     private func loadItemForCurrentGameSession() {
@@ -327,7 +328,8 @@ class PMGameViewController: UIViewController, PMProgressSummaryViewDataSource, P
         })
         self.sessionPerformance.saveEventually()
         
-        if (Float(self.sessionPerformance.correctProblems) / Float(self.sessionPerformance.totalProblems) >= 0.8) {
+        let levelUpCorrectnessPercentage = PMConfig.getCachedConfigValueWithKey(kPMConfigLevelUpCorrectnessPercentageKey) as? Float
+        if (Float(self.sessionPerformance.correctProblems) / Float(self.sessionPerformance.totalProblems) >= levelUpCorrectnessPercentage) {
             if (self.gameProgress.level < 18) {
                 self.gameProgress.level = self.gameProgress.level + 1
                 self.gameProgress.saveEventually()

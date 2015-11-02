@@ -210,49 +210,24 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     }
     
     private func checkForUpdatesInBackground() {
-        if (self.internetReachability.currentReachabilityStatus() == .NotReachable) {
-            let networkAlertBannerView = PMAlertBannerView(style: .Info)
-            networkAlertBannerView.titleLabel.text = "No Internet connection, but no worries"
-            networkAlertBannerView.detailTextLabel.text = "Try to go online so we can sync the latest problems, your progress and performance.\nBut for now, everything will be saved on this device."
-            self.showAlertBannerView(networkAlertBannerView, duration: 8.0, animated: true)
-        } else {
-            let sharedDataLocalQuery = PMSharedData.query()
-            sharedDataLocalQuery?.fromPinWithName(kPMLocalDatastoreSharedDataPinName)
-            sharedDataLocalQuery?.whereKey(kPMSharedDataKeyKey, equalTo: kPMSharedDataProblemSetVersionKeyKey)
-            sharedDataLocalQuery?.getFirstObjectInBackgroundWithBlock({ (localSharedData: PFObject?, sharedDataLocalError: NSError?) -> Void in
-                var localProblemSetVersion: String? = nil
-                if (localSharedData != nil) {
-                    let localSharedData = localSharedData as? PMSharedData
-                    localProblemSetVersion = localSharedData?.sharedDataValue
-                }
-                
-                let sharedDataRemoteQuery = PMSharedData.query()
-                sharedDataRemoteQuery?.whereKey(kPMSharedDataKeyKey, equalTo: kPMSharedDataProblemSetVersionKeyKey)
-                sharedDataRemoteQuery?.getFirstObjectInBackgroundWithBlock({ (remoteSharedData: PFObject?, sharedDataRemoteError: NSError?) -> Void in
-                    if (remoteSharedData != nil && sharedDataRemoteError == nil) {
-                        let remoteSharedData = remoteSharedData as? PMSharedData
-                        if (localProblemSetVersion == nil) {
-                            remoteSharedData?.pinInBackgroundWithName(kPMLocalDatastoreSharedDataPinName)
-                        }
-                        let remoteProblemSetVersion = remoteSharedData?.sharedDataValue
-                        if (localProblemSetVersion != remoteProblemSetVersion) {
-                            self.showActivityIndicatorViewForUpdatingProblemSet()
-                            let problemQuery = PMProblem.query()
-                            localSharedData?.fetchInBackground()
-                            problemQuery?.findObjectsInBackgroundWithBlock({ (problems: [PFObject]?, error: NSError?) -> Void in
-                                if (problems != nil && error == nil) {
-                                    let problems = problems as? [PMProblem]
-                                    PMProblem.unpinAllObjectsInBackgroundWithName(kPMLocalDatastoreProblemPinName, block: { (unpinSuccess: Bool, unpinError: NSError?) -> Void in
-                                        PMProblem.pinAllInBackground(problems, withName: kPMLocalDatastoreProblemPinName, block: { (unpinSuccess: Bool, unpinError: NSError?) -> Void in
-                                            self.dismissViewControllerAnimated(true, completion: nil)
-                                        })
-                                    })
-                                }
+        let lastProblemSetVersion = NSUserDefaults.standardUserDefaults().objectForKey(kPMUserDefaultsLastProblemSetVersionKey) as? Int
+        PMConfig.getConfigValueInBackgroundWithKey(kPMConfigProblemSetVersionKey) { (configValue: AnyObject?, error: NSError?) -> Void in
+            let currentProblemSetVersion = configValue as? Int
+            if (lastProblemSetVersion != currentProblemSetVersion) {
+                NSUserDefaults.standardUserDefaults().setInteger(currentProblemSetVersion!, forKey: kPMUserDefaultsLastProblemSetVersionKey)
+                self.showActivityIndicatorViewForUpdatingProblemSet()
+                let problemQuery = PMProblem.query()
+                problemQuery?.findObjectsInBackgroundWithBlock({ (problems: [PFObject]?, error: NSError?) -> Void in
+                    if (problems != nil && error == nil) {
+                        let problems = problems as? [PMProblem]
+                        PMProblem.unpinAllObjectsInBackgroundWithName(kPMLocalDatastoreProblemPinName, block: { (unpinSuccess: Bool, unpinError: NSError?) -> Void in
+                            PMProblem.pinAllInBackground(problems, withName: kPMLocalDatastoreProblemPinName, block: { (pinSuccess: Bool, pinError: NSError?) -> Void in
+                                self.dismissViewControllerAnimated(true, completion: nil)
                             })
-                        }
+                        })
                     }
                 })
-            })
+            }
         }
     }
     
@@ -309,7 +284,7 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     
     private func loadProblemsInBackgroundWithGameProgress(gameProgress: PMGameProgress, completion: ((success: Bool, problems: [PMProblem]?) -> Void)?) {
         let localProblemsQuery = PMProblem.query()
-        //localProblemsQuery?.limit = 15
+        localProblemsQuery?.limit = 15
         localProblemsQuery?.fromPinWithName(kPMLocalDatastoreProblemPinName)
         localProblemsQuery?.whereKey(kPMProblemLevelKey, equalTo: gameProgress.level)
         localProblemsQuery?.findObjectsInBackgroundWithBlock({ (localProblems: [PFObject]?, localError: NSError?) -> Void in
@@ -368,16 +343,14 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
         legalInfoViewController.modalPresentationStyle = .FormSheet
         self.presentViewController(legalInfoViewController, animated: true, completion: nil)
         
-        let sharedDataQuery = PMSharedData.query()
         if (self.internetReachability.currentReachabilityStatus() == .NotReachable) {
-            sharedDataQuery?.fromPinWithName(kPMLocalDatastoreSharedDataPinName)
+            legalInfoViewController.loadLegalInfoPageWithURLString(nil)
+        } else {
+            PMConfig.getConfigValueInBackgroundWithKey(kPMConfigLegalInfoPageURLKey) { (configValue: AnyObject?, error: NSError?) -> Void in
+                let legalInfoPageWithURLString = configValue as? String
+                legalInfoViewController.loadLegalInfoPageWithURLString(legalInfoPageWithURLString)
+            }
         }
-        sharedDataQuery?.whereKey(kPMSharedDataKeyKey, equalTo: kPMSharedDataLegalInfoPageURLKeyKey)
-        sharedDataQuery?.getFirstObjectInBackgroundWithBlock({ (sharedData: PFObject?, error: NSError?) -> Void in
-            let sharedData = sharedData as! PMSharedData
-            let legalInfoPageURLString = sharedData.sharedDataValue
-            legalInfoViewController.loadLegalInfoPageWithURLString(legalInfoPageURLString)
-        })
     }
     
     private func presentGameViewControllerWithGameProgress(gameProgress: PMGameProgress, problems: [PMProblem]) {
@@ -399,48 +372,16 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
             gameViewController = PMAPlusBGameViewController()
             break
         default:
-            let sharedDataQuery = PMSharedData.query()
-            if (self.internetReachability.currentReachabilityStatus() == .NotReachable) {
-                sharedDataQuery?.fromPinWithName(kPMLocalDatastoreSharedDataPinName)
+            let supportContactName = PMConfig.getCachedConfigValueWithKey(kPMConfigSupportContactNameKey) as? String
+            let supportContactEmail = PMConfig.getCachedConfigValueWithKey(kPMConfigSupportContactEmailKey) as? String
+            
+            if (supportContactName != nil && supportContactEmail != nil) {
+                self.presentInvalidGameProgressAlertControllerWithGameProgress(gameProgress)
+            } else {
+                PMConfig.cacheConfigInBackgroundWithCompletion({ (success: Bool, error: NSError?) -> Void in
+                    self.presentInvalidGameProgressAlertControllerWithGameProgress(gameProgress)
+                })
             }
-            sharedDataQuery?.whereKey(kPMSharedDataKeyKey, containedIn: [kPMSharedDataSupportContactNameKeyKey, kPMSharedDataSupportContactEmailKeyKey])
-            sharedDataQuery?.findObjectsInBackgroundWithBlock({ (sharedDatas: [PFObject]?, error: NSError?) -> Void in
-                if (sharedDatas != nil && error == nil) {
-                    let sharedDatas = sharedDatas as! [PMSharedData]
-                    if (self.internetReachability.currentReachabilityStatus() != .NotReachable) {
-                        PMSharedData.pinAllInBackground(sharedDatas, withName: kPMLocalDatastoreSharedDataPinName)
-                    }
-                    var supportContactName: String!, supportContactEmail: String!
-                    for currentSharedData in sharedDatas {
-                        if (currentSharedData.sharedDataKey == kPMSharedDataSupportContactNameKeyKey) {
-                            supportContactName = currentSharedData.sharedDataValue
-                        }
-                        if (currentSharedData.sharedDataKey == kPMSharedDataSupportContactEmailKeyKey) {
-                            supportContactEmail = currentSharedData.sharedDataValue
-                        }
-                    }
-                    let invalidGameModeAlertController = UIAlertController(title: "Invalid Game Mode", message: "Please contact the Department of Psychology or \(supportContactName!) at \(supportContactEmail!) for more information.", preferredStyle: .Alert)
-                    invalidGameModeAlertController.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-                    invalidGameModeAlertController.addAction(UIAlertAction(title: "Send Email", style: .Default, handler: { (action: UIAlertAction) -> Void in
-                        let mailComposeViewController = MFMailComposeViewController()
-                        mailComposeViewController.mailComposeDelegate = self
-                        mailComposeViewController.setToRecipients([supportContactEmail])
-                        mailComposeViewController.setSubject("PathToMath - Invalid Game Mode")
-                        mailComposeViewController.setMessageBody("Username: \(PMUser.currentUser()?.username!)", isHTML: false)
-                        if (MFMailComposeViewController.canSendMail()) {
-                            self.presentViewController(mailComposeViewController, animated: true, completion: nil)
-                        } else {
-                            let cannotSendEmailAlertBannerView = PMAlertBannerView(style: .Error)
-                            cannotSendEmailAlertBannerView.titleLabel.text = "Could not send email"
-                            cannotSendEmailAlertBannerView.detailTextLabel.text = "Please check your email configurations on this device."
-                            self.showAlertBannerView(cannotSendEmailAlertBannerView, duration: 5.0, animated: true)
-                        }
-                    }))
-                    self.presentViewController(invalidGameModeAlertController, animated: true, completion: { () -> Void in
-                        self.hideLoadingViewAnimated(true)
-                    })
-                }
-            })
             return
         }
         gameViewController.gameProgress = gameProgress
@@ -503,6 +444,64 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
         } else {
             alertBannerView.removeFromSuperview()
         }
+    }
+    
+    private func presentForgotPasswordAlertControllerWithUsername(username: String) {
+        let supportContactName = PMConfig.getCachedConfigValueWithKey(kPMConfigSupportContactNameKey) as? String
+        let supportContactEmail = PMConfig.getCachedConfigValueWithKey(kPMConfigSupportContactEmailKey) as? String
+        
+        var alertMessage = "Please contact the Department of Psychology for more information.\n"
+        if (supportContactEmail != nil && supportContactName != nil) {
+            alertMessage += "Or send an email to \(supportContactName!) (\(supportContactEmail!))."
+        }
+        let forgotPasswordAlertController = UIAlertController(title: "Need help with password?", message: alertMessage, preferredStyle: .Alert)
+        forgotPasswordAlertController.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+        forgotPasswordAlertController.addAction(UIAlertAction(title: "Send Email", style: .Default, handler: { (action: UIAlertAction) -> Void in
+            let mailComposeViewController = MFMailComposeViewController()
+            mailComposeViewController.mailComposeDelegate = self
+            mailComposeViewController.setToRecipients([supportContactEmail!])
+            mailComposeViewController.setSubject("PathToMath - I Forgot My Password")
+            mailComposeViewController.setMessageBody("Username: \(username)", isHTML: false)
+            if (MFMailComposeViewController.canSendMail()) {
+                self.presentViewController(mailComposeViewController, animated: true, completion: nil)
+            } else {
+                let cannotSendEmailAlertBannerView = PMAlertBannerView(style: .Error)
+                cannotSendEmailAlertBannerView.titleLabel.text = "Could not send email"
+                cannotSendEmailAlertBannerView.detailTextLabel.text = "Please check your email configurations on this device."
+                self.showAlertBannerView(cannotSendEmailAlertBannerView, duration: 5.0, animated: true)
+            }
+        }))
+        self.presentViewController(forgotPasswordAlertController, animated: true, completion: nil)
+    }
+    
+    private func presentInvalidGameProgressAlertControllerWithGameProgress(gameProgress: PMGameProgress) {
+        let supportContactEmail = PMConfig.getCachedConfigValueWithKey(kPMConfigSupportContactEmailKey) as? String
+        let supportContactName = PMConfig.getCachedConfigValueWithKey(kPMConfigSupportContactNameKey) as? String
+        
+        var alertMessage = "Please contact the Department of Psychology for more information.\n"
+        if (supportContactEmail != nil && supportContactName != nil) {
+            alertMessage += "Or send an email to \(supportContactName!) (\(supportContactEmail!))."
+        }
+        let invalidGameModeAlertController = UIAlertController(title: "Invalid Game Mode", message: alertMessage, preferredStyle: .Alert)
+        invalidGameModeAlertController.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+        invalidGameModeAlertController.addAction(UIAlertAction(title: "Send Email", style: .Default, handler: { (action: UIAlertAction) -> Void in
+            let mailComposeViewController = MFMailComposeViewController()
+            mailComposeViewController.mailComposeDelegate = self
+            mailComposeViewController.setToRecipients([supportContactEmail!])
+            mailComposeViewController.setSubject("PathToMath - Invalid Game Mode")
+            mailComposeViewController.setMessageBody("Username: \(PMUser.currentUser()?.username!)\n GameMode: \(gameProgress.mode)", isHTML: false)
+            if (MFMailComposeViewController.canSendMail()) {
+                self.presentViewController(mailComposeViewController, animated: true, completion: nil)
+            } else {
+                let cannotSendEmailAlertBannerView = PMAlertBannerView(style: .Error)
+                cannotSendEmailAlertBannerView.titleLabel.text = "Could not send email"
+                cannotSendEmailAlertBannerView.detailTextLabel.text = "Please check your email configurations on this device."
+                self.showAlertBannerView(cannotSendEmailAlertBannerView, duration: 5.0, animated: true)
+            }
+            self.presentViewController(invalidGameModeAlertController, animated: true, completion: { () -> Void in
+                self.hideLoadingViewAnimated(true)
+            })
+        }))
     }
     
     
@@ -609,51 +608,15 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     func loginView(loginView: PMLoginView, didTapForgotPasswordButtonWithUsername username: String) {
         self.view.endEditing(true)
         
-        if (self.internetReachability.currentReachabilityStatus() == .NotReachable) {
-            let forgotPasswordAlertController = UIAlertController(title: "Need help with password?", message: "Please contact the Department of Psychology for more support.", preferredStyle: .Alert)
-            forgotPasswordAlertController.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            self.presentViewController(forgotPasswordAlertController, animated: true, completion: nil)
+        let supportContactName = PMConfig.getCachedConfigValueWithKey(kPMConfigSupportContactNameKey) as? String
+        let supportContactEmail = PMConfig.getCachedConfigValueWithKey(kPMConfigSupportContactEmailKey) as? String
+        
+        if (supportContactName != nil && supportContactEmail != nil) {
+            self.presentForgotPasswordAlertControllerWithUsername(username)
         } else {
-            let sharedDataQuery = PMSharedData.query()
-            if (self.internetReachability.currentReachabilityStatus() == .NotReachable) {
-                sharedDataQuery?.fromPinWithName(kPMLocalDatastoreSharedDataPinName)
+            PMConfig.cacheConfigInBackgroundWithCompletion { (success: Bool, error: NSError?) -> Void in
+                self.presentForgotPasswordAlertControllerWithUsername(username)
             }
-            sharedDataQuery?.whereKey(kPMSharedDataKeyKey, containedIn: [kPMSharedDataSupportContactNameKeyKey, kPMSharedDataSupportContactEmailKeyKey])
-            sharedDataQuery?.findObjectsInBackgroundWithBlock({ (sharedDatas: [PFObject]?, error: NSError?) -> Void in
-                if (sharedDatas != nil && error == nil) {
-                    let sharedDatas = sharedDatas as! [PMSharedData]
-                    if (self.internetReachability.currentReachabilityStatus() != .NotReachable) {
-                        PMSharedData.pinAllInBackground(sharedDatas, withName: kPMLocalDatastoreSharedDataPinName)
-                    }
-                    var supportContactName: String!, supportContactEmail: String!
-                    for currentSharedData in sharedDatas {
-                        if (currentSharedData.sharedDataKey == kPMSharedDataSupportContactNameKeyKey) {
-                            supportContactName = currentSharedData.sharedDataValue
-                        }
-                        if (currentSharedData.sharedDataKey == kPMSharedDataSupportContactEmailKeyKey) {
-                            supportContactEmail = currentSharedData.sharedDataValue
-                        }
-                    }
-                    let forgotPasswordAlertController = UIAlertController(title: "Need help with password?", message: "Please contact the Department of Psychology or \(supportContactName!) at \(supportContactEmail!).", preferredStyle: .Alert)
-                    forgotPasswordAlertController.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-                    forgotPasswordAlertController.addAction(UIAlertAction(title: "Send Email", style: .Default, handler: { (action: UIAlertAction) -> Void in
-                        let mailComposeViewController = MFMailComposeViewController()
-                        mailComposeViewController.mailComposeDelegate = self
-                        mailComposeViewController.setToRecipients([supportContactEmail])
-                        mailComposeViewController.setSubject("PathToMath - I Forgot My Password")
-                        mailComposeViewController.setMessageBody("Username: \(username)", isHTML: false)
-                        if (MFMailComposeViewController.canSendMail()) {
-                            self.presentViewController(mailComposeViewController, animated: true, completion: nil)
-                        } else {
-                            let cannotSendEmailAlertBannerView = PMAlertBannerView(style: .Error)
-                            cannotSendEmailAlertBannerView.titleLabel.text = "Could not send email"
-                            cannotSendEmailAlertBannerView.detailTextLabel.text = "Please check your email configurations on this device."
-                            self.showAlertBannerView(cannotSendEmailAlertBannerView, duration: 5.0, animated: true)
-                        }
-                    }))
-                    self.presentViewController(forgotPasswordAlertController, animated: true, completion: nil)
-                }
-            })
         }
     }
     

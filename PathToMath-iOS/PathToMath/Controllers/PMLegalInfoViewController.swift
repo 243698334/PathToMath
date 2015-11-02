@@ -13,6 +13,7 @@ class PMLegalInfoViewController: UIViewController {
     private var topBarView: UIView!
     private var doneButton: UIButton!
     private var webView: UIWebView!
+    private var noInternetConnectionLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,6 +33,13 @@ class PMLegalInfoViewController: UIViewController {
         self.webView = UIWebView()
         self.webView.backgroundColor = UIColor.whiteColor()
         self.view.addSubview(self.webView)
+        
+        self.noInternetConnectionLabel = UILabel()
+        self.noInternetConnectionLabel.textColor = UIColor.lightGrayColor()
+        self.noInternetConnectionLabel.textAlignment = .Center
+        self.noInternetConnectionLabel.text = "Please connect to the Internet to load this page."
+        self.noInternetConnectionLabel.hidden = true
+        self.view.addSubview(self.noInternetConnectionLabel)
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -40,15 +48,23 @@ class PMLegalInfoViewController: UIViewController {
         self.topBarView.frame = CGRect(x: 0, y: 0, width: self.view.bounds.width, height: 50)
         self.doneButton.frame = CGRect(x: self.topBarView.bounds.width - 80, y: 0, width: 80, height: self.topBarView.frame.height)
         self.webView.frame = CGRect(x: 0, y: CGRectGetMaxY(self.topBarView.frame), width: self.view.bounds.width, height: self.view.bounds.height - self.topBarView.frame.height)
+        self.webView.multipleTouchEnabled = false
+        self.noInternetConnectionLabel.frame = CGRect(x: 0, y: 0, width: self.view.bounds.width, height: 30)
+        self.noInternetConnectionLabel.center = self.view.center
     }
     
     func didTapDoneButton(button: UIButton) {
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     
-    func loadLegalInfoPageWithURLString(legalInfoPageURLString: String) {
-        self.webView.loadRequest(NSURLRequest(URL: NSURL(string: legalInfoPageURLString)!))
-        self.webView.multipleTouchEnabled = false
+    func loadLegalInfoPageWithURLString(legalInfoPageURLString: String?) {
+        if (legalInfoPageURLString == nil) {
+            self.noInternetConnectionLabel.hidden = false
+        } else {
+            self.noInternetConnectionLabel.hidden = true
+            self.webView.loadRequest(NSURLRequest(URL: NSURL(string: legalInfoPageURLString!)!))
+            self.webView.multipleTouchEnabled = false
+        }
     }
 
 }

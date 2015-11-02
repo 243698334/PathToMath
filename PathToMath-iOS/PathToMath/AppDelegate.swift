@@ -9,6 +9,7 @@
 import UIKit
 
 let kPMUserDefaultsLastUsernameKey = "lastUsername"
+let kPMUserDefaultsLastProblemSetVersionKey = "lastProblemSetVersion"
 let kPMUserDefaultsHasShownInteractionHintForCurrentGameMode = "hasInteractionHintShownForCurrentGameMode"
 
 @UIApplicationMain
@@ -22,7 +23,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         PMProblem.registerSubclass()
         PMSessionPerformance.registerSubclass()
         PMProblemResponse.registerSubclass()
-        PMSharedData.registerSubclass()
         PMUser.registerSubclass()
         
         Parse.enableLocalDatastore()

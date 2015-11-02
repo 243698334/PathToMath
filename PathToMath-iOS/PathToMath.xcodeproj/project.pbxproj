@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0E336E6A1BE4ED7500983DE0 /* PMLegalInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E336E691BE4ED7500983DE0 /* PMLegalInfoViewController.swift */; };
+		0E336E731BE70BF500983DE0 /* PMConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E336E721BE70BF500983DE0 /* PMConfig.swift */; };
 		0E34A7051BD6E603009EF978 /* Correct1.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0E34A6D71BD6E603009EF978 /* Correct1.wav */; };
 		0E34A7061BD6E603009EF978 /* Correct2.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0E34A6D81BD6E603009EF978 /* Correct2.wav */; };
 		0E34A7071BD6E603009EF978 /* Wrong1.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0E34A6D91BD6E603009EF978 /* Wrong1.wav */; };
@@ -68,7 +69,6 @@
 		0E6578C21BD61E4600524473 /* PMProblem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E6578A61BD61E4600524473 /* PMProblem.swift */; };
 		0E6578C31BD61E4600524473 /* PMProblemResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E6578A71BD61E4600524473 /* PMProblemResponse.swift */; };
 		0E6578C41BD61E4600524473 /* PMSessionPerformance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E6578A81BD61E4600524473 /* PMSessionPerformance.swift */; };
-		0E6578C51BD61E4600524473 /* PMSharedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E6578A91BD61E4600524473 /* PMSharedData.swift */; };
 		0E6578C61BD61E4600524473 /* PMUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E6578AB1BD61E4600524473 /* PMUser.m */; };
 		0E6578C71BD61E4600524473 /* PMAppSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E6578AE1BD61E4600524473 /* PMAppSession.swift */; };
 		0E6578C81BD61E4600524473 /* PMAlertBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E6578B01BD61E4600524473 /* PMAlertBannerView.swift */; };
@@ -101,6 +101,7 @@
 
 /* Begin PBXFileReference section */
 		0E336E691BE4ED7500983DE0 /* PMLegalInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PMLegalInfoViewController.swift; sourceTree = "<group>"; };
+		0E336E721BE70BF500983DE0 /* PMConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PMConfig.swift; sourceTree = "<group>"; };
 		0E34A6D71BD6E603009EF978 /* Correct1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Correct1.wav; sourceTree = "<group>"; };
 		0E34A6D81BD6E603009EF978 /* Correct2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Correct2.wav; sourceTree = "<group>"; };
 		0E34A6D91BD6E603009EF978 /* Wrong1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Wrong1.wav; sourceTree = "<group>"; };
@@ -161,7 +162,6 @@
 		0E6578A61BD61E4600524473 /* PMProblem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PMProblem.swift; sourceTree = "<group>"; };
 		0E6578A71BD61E4600524473 /* PMProblemResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PMProblemResponse.swift; sourceTree = "<group>"; };
 		0E6578A81BD61E4600524473 /* PMSessionPerformance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PMSessionPerformance.swift; sourceTree = "<group>"; };
-		0E6578A91BD61E4600524473 /* PMSharedData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PMSharedData.swift; sourceTree = "<group>"; };
 		0E6578AA1BD61E4600524473 /* PMUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PMUser.h; sourceTree = "<group>"; };
 		0E6578AB1BD61E4600524473 /* PMUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PMUser.m; sourceTree = "<group>"; };
 		0E6578AE1BD61E4600524473 /* PMAppSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PMAppSession.swift; sourceTree = "<group>"; };
@@ -336,7 +336,6 @@
 				0E6578A61BD61E4600524473 /* PMProblem.swift */,
 				0E6578A71BD61E4600524473 /* PMProblemResponse.swift */,
 				0E6578A81BD61E4600524473 /* PMSessionPerformance.swift */,
-				0E6578A91BD61E4600524473 /* PMSharedData.swift */,
 				0E6578AA1BD61E4600524473 /* PMUser.h */,
 				0E6578AB1BD61E4600524473 /* PMUser.m */,
 			);
@@ -357,6 +356,7 @@
 			children = (
 				0E6578AE1BD61E4600524473 /* PMAppSession.swift */,
 				0E65792D1BD6224F00524473 /* PMAudioPlayer.swift */,
+				0E336E721BE70BF500983DE0 /* PMConfig.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -642,6 +642,7 @@
 				0E6578BB1BD61E4600524473 /* PMApproximateGameViewController.swift in Sources */,
 				0E6578CF1BD61E4600524473 /* PMSideMenuView.swift in Sources */,
 				0E6578C11BD61E4600524473 /* PMGameProgress.swift in Sources */,
+				0E336E731BE70BF500983DE0 /* PMConfig.swift in Sources */,
 				0E6578BD1BD61E4600524473 /* PMGameViewController.swift in Sources */,
 				0E336E6A1BE4ED7500983DE0 /* PMLegalInfoViewController.swift in Sources */,
 				0E6578B91BD61E4600524473 /* PMAbacusGameViewController.swift in Sources */,
@@ -661,7 +662,6 @@
 				0E6578C01BD61E4600524473 /* PMAppSessionLog.swift in Sources */,
 				0E6578C41BD61E4600524473 /* PMSessionPerformance.swift in Sources */,
 				0E6578CE1BD61E4600524473 /* PMProgressSummaryView.swift in Sources */,
-				0E6578C51BD61E4600524473 /* PMSharedData.swift in Sources */,
 				0E6578BF1BD61E4600524473 /* PMStartupViewController.swift in Sources */,
 				0E6578C91BD61E4600524473 /* PMEndOfGameSessionView.swift in Sources */,
 				0E6578CB1BD61E4600524473 /* PMGameView.swift in Sources */,
