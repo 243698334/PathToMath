@@ -1,9 +1,7 @@
 Parse.Cloud.afterSave(Parse.User, function(request) {
     Parse.Cloud.useMasterKey();
     var user = request.object;
-    if (user.existed()) {
-        response.success();
-    } else {
+    if (!user.existed()) {
         var GameProgress = Parse.Object.extend("GameProgress");
         var newUserGameProgress = new GameProgress()
         newUserGameProgress.save({
