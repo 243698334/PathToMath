@@ -526,6 +526,7 @@ class PMGameView: UIView {
             currentItemButton.addTarget(self, action: "itemButtonDragged:withEvent:", forControlEvents: .TouchDragInside)
             currentItemButton.addTarget(self, action: "itemButtonDragged:withEvent:", forControlEvents: .TouchDragOutside)
             currentItemButton.addTarget(self, action: "itemButtonInLeftCloudDropped:", forControlEvents: .TouchUpInside)
+            currentItemButton.addTarget(self, action: "itemButtonInLeftCloudDropped:", forControlEvents: .TouchUpOutside)
         }
         
         self.rightCloudItemContainerView.userInteractionEnabled = true
@@ -538,6 +539,7 @@ class PMGameView: UIView {
             currentItemButton.addTarget(self, action: "itemButtonDragged:withEvent:", forControlEvents: .TouchDragInside)
             currentItemButton.addTarget(self, action: "itemButtonDragged:withEvent:", forControlEvents: .TouchDragOutside)
             currentItemButton.addTarget(self, action: "itemButtonInRightCloudDropped:", forControlEvents: .TouchUpInside)
+            currentItemButton.addTarget(self, action: "itemButtonInRightCloudDropped:", forControlEvents: .TouchUpOutside)
         }
     }
     
