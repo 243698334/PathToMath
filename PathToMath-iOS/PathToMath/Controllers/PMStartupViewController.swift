@@ -212,23 +212,24 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     }
     
     private func checkForUpdatesInBackground() {
+        if (self.internetReachability.currentReachabilityStatus() == .NotReachable) {
+            return
+        }
         let lastProblemSetVersion = NSUserDefaults.standardUserDefaults().objectForKey(kPMUserDefaultsLastProblemSetVersionKey) as? Int
         PMConfig.getConfigValueInBackgroundWithKey(kPMConfigProblemSetVersionKey) { (configValue: AnyObject?, error: NSError?) -> Void in
             let currentProblemSetVersion = configValue as? Int
             if (lastProblemSetVersion != currentProblemSetVersion) {
                 NSUserDefaults.standardUserDefaults().setInteger(currentProblemSetVersion!, forKey: kPMUserDefaultsLastProblemSetVersionKey)
                 self.showActivityIndicatorViewForUpdatingProblemSet()
-                let problemQuery = PMProblem.query()
-                problemQuery?.findObjectsInBackgroundWithBlock({ (problems: [PFObject]?, error: NSError?) -> Void in
-                    if (problems != nil && error == nil) {
-                        let problems = problems as? [PMProblem]
-                        PMProblem.unpinAllObjectsInBackgroundWithName(kPMLocalDatastoreProblemPinName, block: { (unpinSuccess: Bool, unpinError: NSError?) -> Void in
+                self.loadGameProgressInBackground { (success: Bool, gameProgress: PMGameProgress?) -> Void in
+                    PMProblem.unpinAllObjectsInBackgroundWithName(kPMLocalDatastoreProblemPinName, block: { (unpinSuccess: Bool, unpinError: NSError?) -> Void in
+                        self.loadProblemsInBackgroundWithGameProgress(gameProgress!, completion: { (success: Bool, problems: [PMProblem]?) -> Void in
                             PMProblem.pinAllInBackground(problems, withName: kPMLocalDatastoreProblemPinName, block: { (pinSuccess: Bool, pinError: NSError?) -> Void in
                                 self.dismissViewControllerAnimated(true, completion: nil)
                             })
                         })
-                    }
-                })
+                    })
+                }
             }
         }
     }
