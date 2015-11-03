@@ -19,6 +19,8 @@ protocol PMSideMenuViewDataSource: NSObjectProtocol {
     func currentUserDisplayNameInSideMenuView(sideMenuView: PMSideMenuView) -> String
     
     func currentUserAgeInSideMenuView(sideMenuView: PMSideMenuView) -> Int
+    
+    func currentUserIsGuestInSideMenuView(sideMenuView: PMSideMenuView) -> Bool
 }
 
 protocol PMSideMenuViewDelegate: NSObjectProtocol {
@@ -67,7 +69,6 @@ class PMSideMenuView: UIView {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
     
     override func drawRect(rect: CGRect) {
         self.backgroundBlurVisualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .Dark))
@@ -76,7 +77,9 @@ class PMSideMenuView: UIView {
         
         // Time Played
         self.timePlayedView = UIView(frame: CGRect(x: 40, y: 150, width: 176, height: (kTitleLabelHeight + kValueLabelHeight)))
-        self.addSubview(self.timePlayedView)
+        if (self.dataSource?.currentUserIsGuestInSideMenuView(self) != true) {
+            self.addSubview(self.timePlayedView)
+        }
         
         self.timePlayedTitleLabel = UILabel(frame: CGRect(x: self.timePlayedView.bounds.origin.x, y: self.timePlayedView.bounds.origin.y, width: self.timePlayedView.bounds.width, height: kTitleLabelHeight))
         self.timePlayedTitleLabel.textColor = UIColor.whiteColor()
@@ -87,7 +90,7 @@ class PMSideMenuView: UIView {
         self.timePlayedLabel = UILabel(frame: CGRect(x: self.timePlayedView.bounds.origin.x, y: CGRectGetMaxY(self.timePlayedTitleLabel.frame), width: self.timePlayedView.bounds.width, height: kValueLabelHeight))
         self.timePlayedLabel.textColor = UIColor.whiteColor()
         self.timePlayedLabel.font = UIFont.systemFontOfSize(24.0)
-        self.timePlayedLabel.text = "Loading..."
+        self.timePlayedLabel.text = "loading..."
         self.timePlayedView.addSubview(self.timePlayedLabel)
 
         // Game Mode
@@ -142,13 +145,17 @@ class PMSideMenuView: UIView {
         self.userInfoAgeTitleLabel.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
         self.userInfoAgeTitleLabel.textColor = UIColor.whiteColor()
         self.userInfoAgeTitleLabel.text = "age"
-        self.userInfoView.addSubview(self.userInfoAgeTitleLabel)
+        if (self.dataSource?.currentUserIsGuestInSideMenuView(self) != true) {
+            self.userInfoView.addSubview(self.userInfoAgeTitleLabel)
+        }
         
         self.userInfoAgeLabel = UILabel(frame: CGRect(x: self.userInfoView.bounds.origin.x, y: CGRectGetMaxY(self.userInfoAgeTitleLabel.frame), width: self.userInfoView.bounds.width, height: kValueLabelHeight))
         self.userInfoAgeLabel.textColor = UIColor.whiteColor()
         self.userInfoAgeLabel.font = UIFont.systemFontOfSize(24.0)
         self.userInfoAgeLabel.text = String(self.dataSource?.currentUserAgeInSideMenuView(self) as Int!)
-        self.userInfoView.addSubview(self.userInfoAgeLabel)
+        if (self.dataSource?.currentUserIsGuestInSideMenuView(self) != true) {
+            self.userInfoView.addSubview(self.userInfoAgeLabel)
+        }
         
         self.restartSessionButton = UIButton(frame: CGRect(x: 40, y: CGRectGetMaxY(self.userInfoView.frame) + 80, width: 176, height: 50))
         self.restartSessionButton.contentVerticalAlignment = .Center

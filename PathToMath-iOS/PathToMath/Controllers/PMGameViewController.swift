@@ -623,6 +623,10 @@ class PMGameViewController: UIViewController, PMProgressSummaryViewDataSource, P
         return PMUser.currentUser()!.age
     }
     
+    func currentUserIsGuestInSideMenuView(sideMenuView: PMSideMenuView) -> Bool {
+        return self.isCurrentUserAnonymous
+    }
+    
     
     // MARK: PMSideMenuViewDelegate
     

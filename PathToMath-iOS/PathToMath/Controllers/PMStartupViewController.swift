@@ -197,6 +197,8 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
         PMUser.logOutInBackgroundWithBlock { (error) -> Void in
             if (error == nil) {
                 PMAppSession.userDidLogout()
+                PFInstallation.currentInstallation().channels = []
+                PFInstallation.currentInstallation().saveInBackground()
                 self.startGameView.stopLogoutActivityIndicatorAnimation()
                 self.transitionFromView(self.startGameView, toView: self.loginView, forward: false, completion: nil)
             }
