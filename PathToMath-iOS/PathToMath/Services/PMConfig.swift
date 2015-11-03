@@ -13,6 +13,7 @@ let kPMConfigProblemSetVersionKey = "problemSetVersion"
 let kPMConfigSupportContactEmailKey = "supportContactEmail"
 let kPMConfigSupportContactNameKey = "supportContactName"
 let kPMConfigLevelUpCorrectnessPercentageKey = "levelUpCorrectnessPercentageKey"
+let kPMConfigNumberOfProblemsInSession = "numberOfProblemsInSession"
 
 class PMConfig: PFConfig {
     

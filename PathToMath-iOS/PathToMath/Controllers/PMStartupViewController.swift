@@ -53,7 +53,7 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
         self.copyrightLabel.textColor = UIColor.whiteColor()
         self.copyrightLabel.textAlignment = .Center
         self.copyrightLabel.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
-        self.copyrightLabel.text = "Copyright © 2015 Department of Psychology, University of Illinois at Urbana-Champaign"
+        self.copyrightLabel.text = "Copyright © 2015 Brain and Cognitive Development Lab, Department of Psychology, University of Illinois at Urbana-Champaign"
         self.view.addSubview(self.copyrightLabel)
         
         self.loginView = PMLoginView(frame: .zero)
@@ -285,27 +285,53 @@ class PMStartupViewController: UIViewController, PMLoginViewDataSource, PMLoginV
     }
     
     private func loadProblemsInBackgroundWithGameProgress(gameProgress: PMGameProgress, completion: ((success: Bool, problems: [PMProblem]?) -> Void)?) {
+        let problemLevel = gameProgress.level
+        let problemMode = (gameProgress.mode == kPMGameModeApproximate || gameProgress.mode == kPMGameModeAPlusB) ? kPMProblemModeBulk : kPMProblemModeSingle
+        let problemCount = PMConfig.getCachedConfigValueWithKey(kPMConfigNumberOfProblemsInSession) as? Int
+        if (problemCount == nil) {
+            if (self.internetReachability.currentReachabilityStatus() == .NotReachable) {
+                completion?(success: false, problems: nil)
+            } else {
+                PMConfig.getConfigValueInBackgroundWithKey(kPMConfigNumberOfProblemsInSession, completion: { (configValue, error) -> Void in
+                    self.loadProblemsInBackgroundWithGameProgress(gameProgress, completion: completion)
+                })
+            }
+            return
+        }
+        
         let localProblemsQuery = PMProblem.query()
-        localProblemsQuery?.limit = 15
         localProblemsQuery?.fromPinWithName(kPMLocalDatastoreProblemPinName)
-        localProblemsQuery?.whereKey(kPMProblemLevelKey, equalTo: gameProgress.level)
+        localProblemsQuery?.whereKey(kPMProblemLevelKey, equalTo: problemLevel)
+        localProblemsQuery?.whereKey(kPMProblemModeKey, equalTo: problemMode)
         localProblemsQuery?.findObjectsInBackgroundWithBlock({ (localProblems: [PFObject]?, localError: NSError?) -> Void in
             if (localError == nil && localProblems?.count != 0) {
-                completion?(success: true, problems: localProblems as? [PMProblem])
+                let localProblems = localProblems as? [PMProblem]
+                if (localProblems?.count <= problemCount) {
+                    completion?(success: true, problems: localProblems)
+                } else {
+                    var selectedLocalProblems = [PMProblem]()
+                    while (selectedLocalProblems.count < problemCount) {
+                        let nextRandomProblem = localProblems?[Int(arc4random_uniform(UInt32((localProblems?.count)!)))]
+                        if (selectedLocalProblems.contains(nextRandomProblem!) == false) {
+                            selectedLocalProblems.append(nextRandomProblem!)
+                        }
+                    }
+                    completion?(success: true, problems: selectedLocalProblems)
+                }
             } else {
                 if (self.internetReachability.currentReachabilityStatus() == .NotReachable) {
                     completion?(success: false, problems: nil)
                     return
                 }
                 let remoteProblemsQuery = PMProblem.query()
-                remoteProblemsQuery?.limit = 15
-                remoteProblemsQuery?.whereKey(kPMProblemLevelKey, equalTo: gameProgress.level)
+                remoteProblemsQuery?.whereKey(kPMProblemLevelKey, equalTo: problemLevel)
+                remoteProblemsQuery?.whereKey(kPMProblemModeKey, equalTo: problemMode)
                 remoteProblemsQuery?.findObjectsInBackgroundWithBlock({ (remoteProblems: [PFObject]?, remoteError: NSError?) -> Void in
                     if (remoteError == nil && remoteProblems?.count != 0) {
                         let remoteProblems = remoteProblems as? [PMProblem]
                         PMProblem.unpinAllObjectsInBackgroundWithName(kPMLocalDatastoreProblemPinName, block: { (unpinSuccess: Bool, unpinError: NSError?) -> Void in
                             PMProblem.pinAllInBackground(remoteProblems, withName: kPMLocalDatastoreProblemPinName, block: { (unpinSuccess: Bool, unpinError: NSError?) -> Void in
-                                completion?(success: true, problems: remoteProblems)
+                                self.loadProblemsInBackgroundWithGameProgress(gameProgress, completion: completion)
                             })
                         })
                     } else {
