@@ -58,6 +58,7 @@ class PMProgressSummaryView: UIView {
         
         self.continueButton.frame = CGRect(x: 0, y: 650, width: 200, height: 50)
         self.continueButton.center = CGPoint(x: self.center.x, y: self.continueButton.center.y)
+        self.bringSubviewToFront(self.continueButton)
     }
     
     func didTapContinueButton(button: UIButton) {
