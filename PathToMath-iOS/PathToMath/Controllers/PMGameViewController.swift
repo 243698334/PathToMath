@@ -340,8 +340,8 @@ class PMGameViewController: UIViewController, PMProgressSummaryViewDataSource, P
     func startPresentationInGameView(gameView: PMGameView) {
         self.gameState = .Presentation
         
-        self.gameView.drawCloudItems()
-        self.gameView.drawBasketItems()
+        self.gameView.addCloudItems()
+        self.gameView.addBasketItems()
         self.gameView.showCloudAtPosition(.Left)
         self.gameView.showBaskets()
         
@@ -542,7 +542,7 @@ class PMGameViewController: UIViewController, PMProgressSummaryViewDataSource, P
     
     // MARK: PMGameViewDataSource
     
-    func currentProgressInGameView(_: PMGameView) -> Float {
+    func currentProgressPercentageInGameView(_: PMGameView) -> Float {
         return Float(self.currentProblemIndex) / Float(self.problems.count)
     }
     
@@ -594,10 +594,6 @@ class PMGameViewController: UIViewController, PMProgressSummaryViewDataSource, P
     
     func gameView(gameView: PMGameView, didDragAndDropItemToBasketFromCloudAtPosition cloudPosition: PMGameViewCloudPosition) {
         self.didReceiveCloudInteraction(cloudPosition, inGameView: gameView)
-    }
-    
-    func didTapSpaceBarButtonInGameView(gameView: PMGameView) {
-        self.didReceiveUserInteractionInGameView(gameView)
     }
     
     

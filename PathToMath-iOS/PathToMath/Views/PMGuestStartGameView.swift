@@ -29,6 +29,7 @@ class PMGuestStartGameView: UIView, UITableViewDataSource, UITableViewDelegate {
     
     private var titleLabel: UILabel!
     private var selectGameModeButton: UIButton!
+    private var selectGameModeButtonDropdownIconLabel: UILabel!
     private var backButton: UIButton!
     private var startButton: UIButton!
     private var selectGameModeTableView: UITableView!
@@ -40,34 +41,29 @@ class PMGuestStartGameView: UIView, UITableViewDataSource, UITableViewDelegate {
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = UIColor.clearColor()
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func drawRect(rect: CGRect) {
-        self.titleLabel = UILabel(frame: CGRect(x: kHorizontalPadding, y: kSummaryLabelTopMargin, width: rect.width - 2 * kHorizontalPadding, height: kTitleLabelHeight))
+        
+        self.titleLabel = UILabel()
         self.titleLabel.textAlignment = .Center
         self.titleLabel.textColor = UIColor.whiteColor()
         self.titleLabel.font = UIFont.systemFontOfSize(14.0)
         self.titleLabel.text = "Select a game mode to start"
         self.addSubview(self.titleLabel)
-        
-        self.selectGameModeButton = UIButton(frame: CGRect(x: kHorizontalPadding, y: CGRectGetMaxY(self.titleLabel.frame) + kVerticalPadding, width: rect.width - 2 * kHorizontalPadding, height: kButtonHeight))
+
+        self.selectGameModeButton = UIButton()
         self.selectGameModeButton.setTitle("select game mode", forState: .Normal)
         self.selectGameModeButton.layer.cornerRadius = 5
         self.selectGameModeButton.layer.masksToBounds = true
         self.selectGameModeButton.setBackgroundImage(UIImage(named: "ButtonBackgroundOrange"), forState: .Normal)
         self.selectGameModeButton.contentVerticalAlignment = .Center
         self.selectGameModeButton.addTarget(self, action: "didTapSelectGameModeButton:", forControlEvents: .TouchUpInside)
-        let selectGameModeButtonDropdownIconLabel = UILabel(frame: CGRect(x: self.selectGameModeButton.bounds.width - 40, y: (self.selectGameModeButton.bounds.height - 25) / 2, width: 25, height: 25))
-        selectGameModeButtonDropdownIconLabel.text = "▼"
-        selectGameModeButtonDropdownIconLabel.textColor = UIColor.whiteColor()
-        self.selectGameModeButton.addSubview(selectGameModeButtonDropdownIconLabel)
         self.addSubview(self.selectGameModeButton)
+
+        self.selectGameModeButtonDropdownIconLabel = UILabel()
+        self.selectGameModeButtonDropdownIconLabel.text = "▼"
+        self.selectGameModeButtonDropdownIconLabel.textColor = UIColor.whiteColor()
+        self.selectGameModeButton.addSubview(self.selectGameModeButtonDropdownIconLabel)
         
-        self.backButton = UIButton(frame: CGRect(x: kHorizontalPadding, y: CGRectGetMaxY(self.selectGameModeButton.frame) + kVerticalPadding, width: rect.width / 2 - kHorizontalPadding - kVerticalPadding / 2, height: kButtonHeight))
+        self.backButton = UIButton()
         self.backButton.setTitle("back", forState: .Normal)
         self.backButton.layer.cornerRadius = 5
         self.backButton.layer.masksToBounds = true
@@ -76,7 +72,7 @@ class PMGuestStartGameView: UIView, UITableViewDataSource, UITableViewDelegate {
         self.backButton.addTarget(self, action: "didTapBackButton:", forControlEvents: .TouchUpInside)
         self.addSubview(self.backButton)
         
-        self.startButton = UIButton(frame: CGRect(x: (rect.width + kVerticalPadding) / 2.0, y: CGRectGetMaxY(self.selectGameModeButton.frame) + kVerticalPadding, width: rect.width / 2 - kHorizontalPadding - kVerticalPadding / 2, height: kButtonHeight))
+        self.startButton = UIButton()
         self.startButton.setTitle("start", forState: .Normal)
         self.startButton.layer.cornerRadius = 5
         self.startButton.layer.masksToBounds = true
@@ -84,14 +80,29 @@ class PMGuestStartGameView: UIView, UITableViewDataSource, UITableViewDelegate {
         self.startButton.contentVerticalAlignment = .Center
         self.startButton.addTarget(self, action: "didTapStartButton:", forControlEvents: .TouchUpInside)
         self.addSubview(self.startButton)
-        
-        self.guestModeInfoLabel = UILabel(frame: CGRect(x: kHorizontalPadding, y: CGRectGetMaxY(self.backButton.frame) + kVerticalPadding, width: rect.width - 2 * kHorizontalPadding, height: kButtonHeight))
+
+        self.guestModeInfoLabel = UILabel()
         self.guestModeInfoLabel.textAlignment = .Center
         self.guestModeInfoLabel.textColor = UIColor.whiteColor()
         self.guestModeInfoLabel.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
         self.guestModeInfoLabel.numberOfLines = 0
         self.guestModeInfoLabel.text = "You can try the first level problem set in the game mode you choose without logging in."
         self.addSubview(self.guestModeInfoLabel)
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        self.titleLabel.frame = CGRect(x: kHorizontalPadding, y: kSummaryLabelTopMargin, width: self.bounds.width - 2 * kHorizontalPadding, height: kTitleLabelHeight)
+        self.selectGameModeButton.frame = CGRect(x: kHorizontalPadding, y: CGRectGetMaxY(self.titleLabel.frame) + kVerticalPadding, width: self.bounds.width - 2 * kHorizontalPadding, height: kButtonHeight)
+        self.selectGameModeButtonDropdownIconLabel.frame = CGRect(x: self.selectGameModeButton.bounds.width - 40, y: (self.selectGameModeButton.bounds.height - 25) / 2, width: 25, height: 25)
+        self.backButton.frame = CGRect(x: kHorizontalPadding, y: CGRectGetMaxY(self.selectGameModeButton.frame) + kVerticalPadding, width: self.bounds.width / 2 - kHorizontalPadding - kVerticalPadding / 2, height: kButtonHeight)
+        self.startButton.frame = CGRect(x: (self.bounds.width + kVerticalPadding) / 2.0, y: CGRectGetMaxY(self.selectGameModeButton.frame) + kVerticalPadding, width: self.bounds.width / 2 - kHorizontalPadding - kVerticalPadding / 2, height: kButtonHeight)
+        self.guestModeInfoLabel.frame = CGRect(x: kHorizontalPadding, y: CGRectGetMaxY(self.backButton.frame) + kVerticalPadding, width: self.bounds.width - 2 * kHorizontalPadding, height: kButtonHeight)
     }
     
     func didTapSelectGameModeButton(button: UIButton) {

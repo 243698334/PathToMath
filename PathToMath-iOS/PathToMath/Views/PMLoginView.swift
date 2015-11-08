@@ -44,25 +44,9 @@ class PMLoginView: UIView, UITextFieldDelegate {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
-        self.usernameTextField = UITextField(frame: .zero)
-        self.passwordTextField = UITextField(frame: .zero)
-        self.forgotPasswordButton = UIButton(frame: .zero)
-        self.loginButton = UIButton(frame: .zero)
-        self.loginButtonActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
-        self.guestButton = UIButton(frame: .zero)
-        
         self.backgroundColor = .clearColor()
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func drawRect(rect: CGRect) {
-        super.drawRect(rect)
         
-        self.usernameTextField.frame = CGRect(x: kTextFieldHorizontaladding, y: kTextFieldVerticalPadding, width: rect.width - 2 * kTextFieldHorizontaladding, height: kTextFieldHeight)
+        self.usernameTextField = UITextField()
         self.usernameTextField.delegate = self
         self.usernameTextField.autocorrectionType = .No
         self.usernameTextField.autocapitalizationType = .None
@@ -75,10 +59,9 @@ class PMLoginView: UIView, UITextFieldDelegate {
         self.usernameTextField.leftView?.frame = CGRect(x: 0, y: 0, width: kTextFieldIconSize + 2 * kTextFieldIconPadding, height: kTextFieldIconSize)
         self.usernameTextField.leftView?.contentMode = .ScaleAspectFit
         self.usernameTextField.leftViewMode = .Always
-        self.usernameTextField.text = self.dataSource?.savedUsernameInLoginView(self)
         self.addSubview(self.usernameTextField)
-        
-        self.passwordTextField.frame = CGRect(x: kTextFieldHorizontaladding, y: CGRectGetMaxY(self.usernameTextField.frame) + kTextFieldVerticalPadding, width: rect.width - 2 * kTextFieldHorizontaladding, height: kTextFieldHeight)
+
+        self.passwordTextField = UITextField()
         self.passwordTextField.delegate = self
         self.passwordTextField.secureTextEntry = true
         self.passwordTextField.autocorrectionType = .No
@@ -92,10 +75,9 @@ class PMLoginView: UIView, UITextFieldDelegate {
         self.passwordTextField.leftView?.frame = CGRect(x: 0, y: 0, width: kTextFieldIconSize + 2 * kTextFieldIconPadding, height: kTextFieldIconSize)
         self.passwordTextField.leftView?.contentMode = .ScaleAspectFit
         self.passwordTextField.leftViewMode = .Always
-        self.passwordTextField.text = self.dataSource?.savedPasswordInLoginView(self)
         self.addSubview(self.passwordTextField)
-        
-        self.forgotPasswordButton.frame = CGRect(x: kTextFieldHorizontaladding, y: CGRectGetMaxY(self.passwordTextField.frame) + kTextFieldVerticalPadding, width: rect.width - 2 * kTextFieldHorizontaladding, height: 20)
+
+        self.forgotPasswordButton = UIButton()
         self.forgotPasswordButton.backgroundColor = .clearColor()
         self.forgotPasswordButton.setTitle("forgot your password?", forState: .Normal)
         self.forgotPasswordButton.titleLabel?.font = self.forgotPasswordButton.titleLabel?.font.fontWithSize(UIFont.smallSystemFontSize())
@@ -103,7 +85,7 @@ class PMLoginView: UIView, UITextFieldDelegate {
         self.forgotPasswordButton.addTarget(self, action: "didTapForgotPasswordButton:", forControlEvents: .TouchUpInside)
         self.addSubview(self.forgotPasswordButton)
 
-        self.loginButton.frame = CGRect(x: kTextFieldHorizontaladding, y: CGRectGetMaxY(self.forgotPasswordButton.frame) + kTextFieldVerticalPadding, width: rect.width - 2 * kTextFieldHorizontaladding, height: kTextFieldHeight)
+        self.loginButton = UIButton()
         self.loginButton.setTitle("login", forState: .Normal)
         self.loginButton.layer.cornerRadius = 5
         self.loginButton.layer.masksToBounds = true
@@ -111,14 +93,36 @@ class PMLoginView: UIView, UITextFieldDelegate {
         self.loginButton.contentVerticalAlignment = .Center
         self.loginButton.addTarget(self, action: "didTapLoginButton:", forControlEvents: .TouchUpInside)
         self.addSubview(self.loginButton)
+
+        self.loginButtonActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
         
-        self.guestButton.frame = CGRect(x: 0, y: CGRectGetMaxY(self.loginButton.frame) + kTextFieldVerticalPadding, width: 80, height: 30)
-        self.guestButton.center = CGPoint(x: self.loginButton.center.x, y: self.guestButton.center.y)
+        self.guestButton = UIButton()
         self.guestButton.setTitle("I'm a guest", forState: .Normal)
         self.guestButton.setTitleColor(UIColor.whiteColor(), forState: .Normal)
         self.guestButton.titleLabel?.font = self.guestButton.titleLabel?.font.fontWithSize(UIFont.smallSystemFontSize())
         self.guestButton.addTarget(self, action: "didTapGuestButton:", forControlEvents: .TouchUpInside)
         self.addSubview(self.guestButton)
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        self.usernameTextField.frame = CGRect(x: kTextFieldHorizontaladding, y: kTextFieldVerticalPadding, width: self.bounds.width - 2 * kTextFieldHorizontaladding, height: kTextFieldHeight)
+        self.usernameTextField.text = self.dataSource?.savedUsernameInLoginView(self)
+
+        self.passwordTextField.frame = CGRect(x: kTextFieldHorizontaladding, y: CGRectGetMaxY(self.usernameTextField.frame) + kTextFieldVerticalPadding, width: self.bounds.width - 2 * kTextFieldHorizontaladding, height: kTextFieldHeight)
+        self.passwordTextField.text = self.dataSource?.savedPasswordInLoginView(self)
+        
+        self.forgotPasswordButton.frame = CGRect(x: kTextFieldHorizontaladding, y: CGRectGetMaxY(self.passwordTextField.frame) + kTextFieldVerticalPadding, width: self.bounds.width - 2 * kTextFieldHorizontaladding, height: 20)
+        
+        self.loginButton.frame = CGRect(x: kTextFieldHorizontaladding, y: CGRectGetMaxY(self.forgotPasswordButton.frame) + kTextFieldVerticalPadding, width: self.bounds.width - 2 * kTextFieldHorizontaladding, height: kTextFieldHeight)
+        
+        self.guestButton.frame = CGRect(x: 0, y: CGRectGetMaxY(self.loginButton.frame) + kTextFieldVerticalPadding, width: 80, height: 30)
+        self.guestButton.center = CGPoint(x: self.loginButton.center.x, y: self.guestButton.center.y)
     }
     
     func startLoginActivityIndicatorAnimation() {

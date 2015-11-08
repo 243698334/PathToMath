@@ -28,30 +28,36 @@ class PMProgressSummaryView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func drawRect(rect: CGRect) {
-        self.backgroundImageView = UIImageView(frame: self.bounds)
+        
+        self.backgroundImageView = UIImageView()
         self.backgroundImageView.image = UIImage(named: "ProgressSummaryViewBackground")
         self.addSubview(self.backgroundImageView)
         
-        for currentLevel in 1...(self.dataSource?.levelInProgressSummaryView(self))! {
-            let currentLevelImageView = UIImageView(image: UIImage(named: "ProgressImageLevel" + String(currentLevel)))
-            self.addSubview(currentLevelImageView)
-        }
-        
-        self.continueButton = UIButton(frame: CGRect(x: 0, y: 650, width: 200, height: 50))
-        self.continueButton.center = CGPoint(x: self.center.x, y: self.continueButton.center.y)
+        self.continueButton = UIButton()
         self.continueButton.layer.cornerRadius = 5
         self.continueButton.layer.masksToBounds = true
         self.continueButton.setBackgroundImage(UIImage(named: "ButtonBackgroundGreen"), forState: .Normal)
         self.continueButton.setTitle("Continue", forState: .Normal)
         self.continueButton.addTarget(self, action: "didTapContinueButton:", forControlEvents: .TouchUpInside)
         self.addSubview(self.continueButton)
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        self.backgroundImageView.frame = self.bounds
+        
+        for currentLevel in 1...(self.dataSource?.levelInProgressSummaryView(self))! {
+            let currentLevelImageView = UIImageView(image: UIImage(named: "ProgressImageLevel" + String(currentLevel)))
+            self.addSubview(currentLevelImageView)
+        }
+        
+        self.continueButton.frame = CGRect(x: 0, y: 650, width: 200, height: 50)
+        self.continueButton.center = CGPoint(x: self.center.x, y: self.continueButton.center.y)
     }
     
     func didTapContinueButton(button: UIButton) {

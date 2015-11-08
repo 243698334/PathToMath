@@ -27,7 +27,7 @@ protocol PMGameViewDataSource: NSObjectProtocol {
         - gameView: The GameView requesting such information.
     - returns: A Float value (between 0.0 and 1.0) represents the percentage of the progress.
     */
-    func currentProgressInGameView(gameView: PMGameView) -> Float
+    func currentProgressPercentageInGameView(gameView: PMGameView) -> Float
     
     /**
     Asks the data source for the number of items in each clouds.
@@ -108,14 +108,6 @@ protocol PMGameViewDelegate: NSObjectProtocol {
         - cloudPosition: The position of the cloud where the item was in, either Left or Right.
     */
     func gameView(gameView: PMGameView, didDragAndDropItemToBasketFromCloudAtPosition cloudPosition: PMGameViewCloudPosition)
-    
-    /**
-    Tells the delegate that the the space bar was tapped.
-    
-    - parameters:
-        - gameView: The GameView where the control event took place.
-    */
-    func didTapSpaceBarButtonInGameView(gameView: PMGameView)
 }
 
 
@@ -144,7 +136,6 @@ class PMGameView: UIView {
     weak var dataSource: PMGameViewDataSource?
     
     private var backgroundImageView: UIImageView!
-    private var spaceBarButton : UIButton!
     private var interactionHintLabel: UILabel!
 
     private var progressRoadImageView: UIImageView!
@@ -187,101 +178,118 @@ class PMGameView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        self.setupBackground()
+        self.setupInteractionHint()
+        self.setupProgressRoad()
+        self.setupClouds()
+        self.setupBaskets()
+        self.setupHidingItems()
+        self.setupAbacuses()
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func drawRect(rect: CGRect) {
-        self.drawBackground()
-        self.drawSpaceBar()
-        self.drawInteractionHint()
-        self.drawProgressRoad()
-        self.drawClouds()
-        self.drawBaskets()
-        self.drawHidingItems()
-        self.drawAbacuses()
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        self.layoutBackground()
+        self.layoutInteractionHint()
+        self.layoutProgressRoad()
+        self.layoutClouds()
+        self.layoutBaskets()
+        self.layoutHidingItems()
+        self.layoutAbacuses()
+        
         self.bringSubviewToFront(self.leftBasketFrontButton)
         self.bringSubviewToFront(self.rightBasketFrontImageView)
         self.sendSubviewToBack(self.backgroundImageView)
     }
     
-    private func drawBackground() {
+    private func setupBackground() {
         self.backgroundImageView = UIImageView(image: UIImage(named: "GameViewBackground"))
-        self.backgroundImageView.frame = self.bounds
         self.addSubview(self.backgroundImageView)
     }
     
-    private func drawSpaceBar() {
-        self.spaceBarButton = UIButton(frame: CGRect(x: 0, y: 650, width: 200, height: 50))
-        self.spaceBarButton.center = CGPoint(x: self.center.x, y: self.spaceBarButton.center.y)
-        self.spaceBarButton.layer.cornerRadius = 5
-        self.spaceBarButton.layer.masksToBounds = true
-        self.spaceBarButton.setBackgroundImage(UIImage(named: "ButtonBackgroundGreen"), forState: .Normal)
-        self.spaceBarButton.setTitle("space", forState: .Normal)
-        self.spaceBarButton.addTarget(self, action: "didTapSpaceBarButton:", forControlEvents: .TouchUpInside)
-        self.spaceBarButton.hidden = true
-        self.addSubview(self.spaceBarButton)
+    private func layoutBackground() {
+        self.backgroundImageView.frame = self.bounds
     }
     
-    private func drawInteractionHint() {
-        self.interactionHintLabel = UILabel(frame: CGRect(x: 0, y: kHintLabelOriginY, width: 500, height: 40))
-        self.interactionHintLabel.center = CGPoint(x: self.center.x, y: self.interactionHintLabel.center.y)
+    private func setupInteractionHint() {
+        self.interactionHintLabel = UILabel()
         self.interactionHintLabel.textAlignment = .Center
         self.interactionHintLabel.font = UIFont.systemFontOfSize(28)
-        self.interactionHintLabel.text = "Choose the basket with more \((self.dataSource?.itemNameInGameView(self))!)s"
         self.interactionHintLabel.hidden = true
         self.addSubview(self.interactionHintLabel)
     }
     
-    private func drawProgressRoad() {
-        self.progressRoadImageView = UIImageView(frame: CGRect(x: kRoadProgressOriginX, y: 50, width: kRoadProgressWidth, height: 30))
-        self.progressRoadImageView.image = UIImage(named: "RoadProgress")
+    private func layoutInteractionHint() {
+        self.interactionHintLabel.frame = CGRect(x: 0, y: kHintLabelOriginY, width: 500, height: 40)
+        self.interactionHintLabel.center = CGPoint(x: self.center.x, y: self.interactionHintLabel.center.y)
+        self.interactionHintLabel.text = "Choose the basket with more \((self.dataSource?.itemNameInGameView(self))!)s"
+    }
+    
+    private func setupProgressRoad() {
+        self.progressRoadImageView = UIImageView(image: UIImage(named: "RoadProgress"))
         self.addSubview(self.progressRoadImageView)
         
-        self.munduGuyImageView = UIImageView(frame: CGRect(x: kRoadProgressOriginX, y: 20, width: 25, height: 50))
-        self.munduGuyImageView.image = UIImage(named: "RoadMunduGuy1")
+        self.munduGuyImageView = UIImageView(image: UIImage(named: "RoadMunduGuy1"))
+        self.munduGuyImageView.frame = CGRect(x: kRoadProgressOriginX, y: 20, width: 25, height: 50)
         self.addSubview(self.munduGuyImageView)
     }
     
-    private func drawClouds() {
-        self.leftCloudButton = UIButton(frame: CGRect(x: 0, y: kCloudsOriginY, width: 350, height: 260))
+    private func layoutProgressRoad() {
+        self.progressRoadImageView.frame = CGRect(x: kRoadProgressOriginX, y: 50, width: kRoadProgressWidth, height: 30)
+    }
+    
+    private func setupClouds() {
+        self.leftCloudButton = UIButton()
         self.leftCloudButton.setImage(UIImage(named: "Cloud"), forState: .Normal)
         self.leftCloudButton.addTarget(self, action: "didTapLeftCloudButton:", forControlEvents: .TouchUpInside)
         self.leftCloudButton.hidden = true
         self.insertSubview(self.leftCloudButton, atIndex: kCloudImageViewSubviewIndexIndex)
-        self.leftCloudItemContainerView = UIView(frame: CGRect(x: 0, y: 0, width: 250, height: 180))
-        self.leftCloudItemContainerView.center = CGPoint(x: self.leftCloudButton.bounds.width / 2.0, y: self.leftCloudButton.bounds.height / 2.0)
+       
+        self.leftCloudItemContainerView = UIView()
         self.leftCloudItemContainerView.userInteractionEnabled = false
         self.leftCloudButton.addSubview(self.leftCloudItemContainerView)
         
-        self.rightCloudButton = UIButton(frame: CGRect(x: CGRectGetMaxX(self.leftCloudButton.frame) - 20, y: kCloudsOriginY, width: 350, height: 260))
+        self.rightCloudButton = UIButton()
         self.rightCloudButton.setImage(UIImage(named: "Cloud"), forState: .Normal)
         self.rightCloudButton.addTarget(self, action: "didTapRightCloudButton:", forControlEvents: .TouchUpInside)
         self.rightCloudButton.hidden = true
         self.insertSubview(self.rightCloudButton, aboveSubview:self.leftCloudButton)
-        self.rightCloudItemContainerView = UIView(frame: CGRect(x: 0, y: 0, width: 250, height: 180))
-        self.rightCloudItemContainerView.center = CGPoint(x: self.rightCloudButton.bounds.width / 2.0, y: self.rightCloudButton.bounds.height / 2.0)
+        
+        self.rightCloudItemContainerView = UIView()
         self.rightCloudItemContainerView.userInteractionEnabled = false
         self.rightCloudButton.addSubview(self.rightCloudItemContainerView)
     }
     
-    private func drawBaskets() {
-        self.leftBasketAboveImageView = UIImageView(frame: CGRect(x: kLeftBasketOriginX, y: kBasketsOriginY, width: 341, height: 310))
-        self.leftBasketAboveImageView.image = UIImage(named: "BasketAboveContrast")
+    private func layoutClouds() {
+        self.leftCloudButton.frame = CGRect(x: 0, y: kCloudsOriginY, width: 350, height: 260)
+        self.leftCloudItemContainerView.frame = CGRect(x: 0, y: 0, width: 250, height: 180)
+        self.leftCloudItemContainerView.center = CGPoint(x: self.leftCloudButton.bounds.width / 2.0, y: self.leftCloudButton.bounds.height / 2.0)
+        
+        self.rightCloudButton.frame = CGRect(x: CGRectGetMaxX(self.leftCloudButton.frame) - 20, y: kCloudsOriginY, width: 350, height: 260)
+        self.rightCloudItemContainerView.frame = CGRect(x: 0, y: 0, width: 250, height: 180)
+        self.rightCloudItemContainerView.center = CGPoint(x: self.rightCloudButton.bounds.width / 2.0, y: self.rightCloudButton.bounds.height / 2.0)
+    }
+    
+    private func setupBaskets() {
+        self.leftBasketAboveImageView = UIImageView(image: UIImage(named: "BasketAboveContrast"))
         self.leftBasketAboveImageView.hidden = true
         self.insertSubview(self.leftBasketAboveImageView, atIndex: kBasketAboveImageViewSubviewIndex)
-        self.leftBasketItemContainerView = UIView(frame: CGRect(x: 45, y: 30, width: 250, height: 200))
+        self.leftBasketItemContainerView = UIView()
         self.leftBasketAboveImageView.addSubview(self.leftBasketItemContainerView)
         
-        self.leftBasketBehindButton = UIButton(frame: CGRect(x: kLeftBasketOriginX, y: kBasketsOriginY, width: 341, height: 132))
+        self.leftBasketBehindButton = UIButton()
         self.leftBasketBehindButton.setImage(UIImage(named: "BasketBehind"), forState: .Normal)
         self.leftBasketBehindButton.userInteractionEnabled = false
         self.leftBasketBehindButton.hidden = true
         self.insertSubview(self.leftBasketBehindButton, atIndex: kBasketBehindButtonSubviewIndex)
         
-        self.leftBasketFrontButton = UIButton(frame: CGRect(x: kLeftBasketOriginX, y: kBasketsOriginY, width: 341, height: 305))
+        self.leftBasketFrontButton = UIButton()
         self.leftBasketFrontButton.setImage(UIImage(named: "BasketFront"), forState: .Normal)
         self.leftBasketFrontButton.userInteractionEnabled = false
         self.leftBasketFrontButton.addTarget(self, action: "didTapLeftBasketButton:", forControlEvents: .TouchUpInside)
@@ -291,38 +299,46 @@ class PMGameView: UIView {
         self.leftBasketFrontButton.hidden = true
         self.insertSubview(self.leftBasketFrontButton, atIndex: kBasketFrontButtonSubviewIndex)
         
-        self.rightBasketAboveButton = UIButton(frame: CGRect(x: kRightBasketOriginX, y: kBasketsOriginY, width: 341, height: 310))
+        self.rightBasketAboveButton = UIButton()
         self.rightBasketAboveButton.setImage(UIImage(named: "BasketAboveContrast"), forState: .Normal)
         self.rightBasketAboveButton.addTarget(self, action: "didTapRightBasketButton:", forControlEvents: .TouchUpInside)
         self.rightBasketAboveButton.hidden = true
         self.insertSubview(self.rightBasketAboveButton, atIndex: kBasketAboveImageViewSubviewIndex)
-        self.rightBasketItemContainerView = UIView(frame: CGRect(x: 45, y: 30, width: 250, height: 200))
+        self.rightBasketItemContainerView = UIView()
         self.rightBasketItemContainerView.userInteractionEnabled = false
         self.rightBasketAboveButton.addSubview(self.rightBasketItemContainerView)
         
-        self.rightBasketBehindImageView = UIImageView(frame: CGRect(x: kRightBasketOriginX, y: kBasketsOriginY, width: 341, height: 132))
-        self.rightBasketBehindImageView.image = UIImage(named: "BasketBehind")
+        self.rightBasketBehindImageView = UIImageView(image: UIImage(named: "BasketBehind"))
         self.rightBasketBehindImageView.hidden = true
         self.insertSubview(self.rightBasketBehindImageView, atIndex: kBasketBehindButtonSubviewIndex)
 
-        self.rightBasketFrontImageView = UIImageView(frame: CGRect(x: kRightBasketOriginX, y: kBasketsOriginY, width: 341, height: 305))
-        self.rightBasketFrontImageView.image = UIImage(named: "BasketFront")
+        self.rightBasketFrontImageView = UIImageView(image: UIImage(named: "BasketFront"))
         self.rightBasketFrontImageView.userInteractionEnabled = false
         self.rightBasketFrontImageView.hidden = true
         self.insertSubview(self.rightBasketFrontImageView, atIndex: kBasketFrontButtonSubviewIndex)
     }
     
-    private func drawAbacuses() {
-        self.leftAbacusView = UIView(frame: CGRect(x: 0, y: CGRectGetMaxY(self.leftBasketAboveImageView.frame), width: 205, height: 100))
-        self.leftAbacusView.center = CGPoint(x: self.leftBasketAboveImageView.center.x, y: self.leftAbacusView.center.y)
+    private func layoutBaskets() {
+        self.leftBasketAboveImageView.frame = CGRect(x: kLeftBasketOriginX, y: kBasketsOriginY, width: 341, height: 310)
+        self.leftBasketItemContainerView.frame = CGRect(x: 45, y: 30, width: 250, height: 200)
+        self.leftBasketBehindButton.frame = CGRect(x: kLeftBasketOriginX, y: kBasketsOriginY, width: 341, height: 132)
+        self.leftBasketFrontButton.frame = CGRect(x: kLeftBasketOriginX, y: kBasketsOriginY, width: 341, height: 305)
+
+        self.rightBasketAboveButton.frame = CGRect(x: kRightBasketOriginX, y: kBasketsOriginY, width: 341, height: 310)
+        self.rightBasketItemContainerView.frame = CGRect(x: 45, y: 30, width: 250, height: 200)
+        self.rightBasketBehindImageView.frame = CGRect(x: kRightBasketOriginX, y: kBasketsOriginY, width: 341, height: 132)
+        self.rightBasketFrontImageView.frame = CGRect(x: kRightBasketOriginX, y: kBasketsOriginY, width: 341, height: 305)
+    }
+    
+    private func setupAbacuses() {
+        self.leftAbacusView = UIView()
         self.leftAbacusView.addSubview(UIImageView(image: UIImage(named: "AbacusBackground")))
         self.leftAbacusRedBeadImageViews = [UIImageView]()
         self.leftAbacusBlueBeadImageViews = [UIImageView]()
         self.leftAbacusView.hidden = true
         self.leftAbacusNumber = 0
         
-        self.rightAbacusView = UIView(frame: CGRect(x: 0, y: CGRectGetMaxY(self.rightBasketAboveButton.frame), width: 205, height: 100))
-        self.rightAbacusView.center = CGPoint(x: self.rightBasketAboveButton.center.x, y: self.rightAbacusView.center.y)
+        self.rightAbacusView = UIView()
         self.rightAbacusView.addSubview(UIImageView(image: UIImage(named: "AbacusBackground")))
         self.rightAbacusRedBeadImageViews = [UIImageView]()
         self.rightAbacusBlueBeadImageViews = [UIImageView]()
@@ -358,16 +374,32 @@ class PMGameView: UIView {
         self.addSubview(self.rightAbacusView)
     }
     
-    private func drawHidingItems() {
-        self.leftHidingItemImageView = UIImageView(image: self.dataSource?.gameView(self, itemHidingImageAtBasketPosition: .Left))
-        self.leftHidingItemImageView.center = self.leftBasketAboveImageView.center
+    private func layoutAbacuses() {
+        self.leftAbacusView.frame = CGRect(x: 0, y: CGRectGetMaxY(self.leftBasketAboveImageView.frame), width: 205, height: 100)
+        self.leftAbacusView.center = CGPoint(x: self.leftBasketAboveImageView.center.x, y: self.leftAbacusView.center.y)
+
+        self.rightAbacusView.frame = CGRect(x: 0, y: CGRectGetMaxY(self.rightBasketAboveButton.frame), width: 205, height: 100)
+        self.rightAbacusView.center = CGPoint(x: self.rightBasketAboveButton.center.x, y: self.rightAbacusView.center.y)
+    }
+    
+    private func setupHidingItems() {
+        self.leftHidingItemImageView = UIImageView()
         self.leftHidingItemImageView.hidden = true
         self.insertSubview(self.leftHidingItemImageView, belowSubview: self.leftBasketAboveImageView)
         
-        self.rightHidingItemImageView = UIImageView(image: self.dataSource?.gameView(self, itemHidingImageAtBasketPosition: .Right))
-        self.rightHidingItemImageView.center = self.rightBasketAboveButton.center
+        self.rightHidingItemImageView = UIImageView()
         self.rightHidingItemImageView.hidden = true
         self.insertSubview(self.rightHidingItemImageView, belowSubview: self.rightBasketAboveButton)
+    }
+    
+    private func layoutHidingItems() {
+        self.leftHidingItemImageView.image = self.dataSource?.gameView(self, itemHidingImageAtBasketPosition: .Left)
+        self.leftHidingItemImageView.sizeToFit()
+        self.leftHidingItemImageView.center = self.leftBasketAboveImageView.center
+
+        self.rightHidingItemImageView.image = self.dataSource?.gameView(self, itemHidingImageAtBasketPosition: .Right)
+        self.rightHidingItemImageView.sizeToFit()
+        self.rightHidingItemImageView.center = self.rightBasketAboveButton.center
     }
     
     func didTapLeftCloudButton(_: UIButton) {
@@ -395,11 +427,7 @@ class PMGameView: UIView {
         self.leftBasketBehindButton.highlighted = false
     }
     
-    func didTapSpaceBarButton(_: UIButton) {
-        self.delegate?.didTapSpaceBarButtonInGameView(self)
-    }
-    
-    private func drawItemImage(itemImage: UIImage, amount: Int, inContainerView containerView: UIView) {
+    private func addItemImages(itemImage: UIImage, amount: Int, inContainerView containerView: UIView) {
         let extralargeItemImageResizeRatio = sqrt(0.4 * containerView.bounds.size.width * containerView.bounds.size.height / (itemImage.size.width * itemImage.size.height * 4))
         let largeItemImageResizeRatio = sqrt(0.4 * containerView.bounds.size.width * containerView.bounds.size.height / (itemImage.size.width * itemImage.size.height * 8))
         let mediumItemImageResizeRatio = sqrt(0.4 * containerView.bounds.size.width * containerView.bounds.size.height / (itemImage.size.width * itemImage.size.height * 12))
@@ -478,13 +506,13 @@ class PMGameView: UIView {
     
     // MARK: Methods for Game View Controller
     
-    func drawCloudItems() {
+    func addCloudItems() {
         let itemImage = self.dataSource?.itemImageInGameView(self)
         let leftCloudItemCount = self.dataSource?.gameView(self, numberOfItemsInCloudAtPosition: .Left)
         let rightCloudItemCount = self.dataSource?.gameView(self, numberOfItemsInCloudAtPosition: .Right)
         
-        self.drawItemImage(itemImage!, amount: leftCloudItemCount!, inContainerView: self.leftCloudItemContainerView)
-        self.drawItemImage(itemImage!, amount: rightCloudItemCount!, inContainerView: self.rightCloudItemContainerView)
+        self.addItemImages(itemImage!, amount: leftCloudItemCount!, inContainerView: self.leftCloudItemContainerView)
+        self.addItemImages(itemImage!, amount: rightCloudItemCount!, inContainerView: self.rightCloudItemContainerView)
         
         self.leftCloudItemOriginalOriginPoints = [CGPoint]()
         for currentSubview in self.leftCloudItemContainerView.subviews {
@@ -496,13 +524,13 @@ class PMGameView: UIView {
         }
     }
     
-    func drawBasketItems() {
+    func addBasketItems() {
         let itemImage = self.dataSource?.itemImageInGameView(self)
         let leftBasketItemCount = self.dataSource?.gameView(self, numberOfItemsInBasketAtPosition: .Left)
         let rightBasketItemCount = self.dataSource?.gameView(self, numberOfItemsInBasketAtPosition: .Right)
         
-        self.drawItemImage(itemImage!, amount: leftBasketItemCount!, inContainerView: self.leftBasketItemContainerView)
-        self.drawItemImage(itemImage!, amount: rightBasketItemCount!, inContainerView: self.rightBasketItemContainerView)
+        self.addItemImages(itemImage!, amount: leftBasketItemCount!, inContainerView: self.leftBasketItemContainerView)
+        self.addItemImages(itemImage!, amount: rightBasketItemCount!, inContainerView: self.rightBasketItemContainerView)
         
         self.leftBasketItemOriginalOriginPoints = [CGPoint]()
         for currentSubview in self.leftBasketItemContainerView.subviews {
@@ -551,22 +579,6 @@ class PMGameView: UIView {
     func disableUserInteractionOnBaskets() {
         self.leftBasketFrontButton.userInteractionEnabled = false
         self.rightBasketAboveButton.userInteractionEnabled = false
-    }
-    
-    func showSpaceBar() {
-        self.spaceBarButton.alpha = 0
-        self.spaceBarButton.hidden = false
-        UIView.animateWithDuration(0.25) { () -> Void in
-            self.spaceBarButton.alpha = 1
-        }
-    }
-    
-    func hideSpaceBar() {
-        UIView.animateWithDuration(0.25, animations: { () -> Void in
-            self.spaceBarButton.alpha = 0
-        }) { (finished: Bool) -> Void in
-            self.spaceBarButton.hidden = true
-        }
     }
     
     func showBaskets() {
@@ -1065,7 +1077,6 @@ class PMGameView: UIView {
     
     func enterIntermission() {
         self.hideInteractionHint()
-        self.hideSpaceBar()
         self.hideBaskets()
         self.hideAbacusAtPosition(.Left)
         self.hideAbacusAtPosition(.Right)
@@ -1074,7 +1085,7 @@ class PMGameView: UIView {
     }
     
     func updateRoadProgressWithDuration(duration: NSTimeInterval) {
-        let munduGuyTargetOriginX = kRoadProgressWidth * CGFloat((self.dataSource?.currentProgressInGameView(self))!) + kRoadProgressOriginX
+        let munduGuyTargetOriginX = kRoadProgressWidth * CGFloat((self.dataSource?.currentProgressPercentageInGameView(self))!) + kRoadProgressOriginX
         var munduGuyImageViewTargetFrame = self.munduGuyImageView.frame
         munduGuyImageViewTargetFrame.origin.x = munduGuyTargetOriginX
         UIView.animateWithDuration(duration, animations: { () -> Void in

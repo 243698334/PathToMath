@@ -64,100 +64,79 @@ class PMSideMenuView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = UIColor.clearColor()
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func drawRect(rect: CGRect) {
+        
         self.backgroundBlurVisualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .Dark))
-        self.backgroundBlurVisualEffectView.frame = self.bounds
         self.addSubview(self.backgroundBlurVisualEffectView)
         
-        // Time Played
-        self.timePlayedView = UIView(frame: CGRect(x: 40, y: 150, width: 176, height: (kTitleLabelHeight + kValueLabelHeight)))
-        if (self.dataSource?.currentUserIsGuestInSideMenuView(self) != true) {
-            self.addSubview(self.timePlayedView)
-        }
+        self.timePlayedView = UIView()
+        self.addSubview(self.timePlayedView)
         
-        self.timePlayedTitleLabel = UILabel(frame: CGRect(x: self.timePlayedView.bounds.origin.x, y: self.timePlayedView.bounds.origin.y, width: self.timePlayedView.bounds.width, height: kTitleLabelHeight))
+        self.timePlayedTitleLabel = UILabel()
         self.timePlayedTitleLabel.textColor = UIColor.whiteColor()
         self.timePlayedTitleLabel.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
         self.timePlayedTitleLabel.text = "time played today"
         self.timePlayedView.addSubview(self.timePlayedTitleLabel)
-
-        self.timePlayedLabel = UILabel(frame: CGRect(x: self.timePlayedView.bounds.origin.x, y: CGRectGetMaxY(self.timePlayedTitleLabel.frame), width: self.timePlayedView.bounds.width, height: kValueLabelHeight))
+        
+        self.timePlayedLabel = UILabel()
         self.timePlayedLabel.textColor = UIColor.whiteColor()
         self.timePlayedLabel.font = UIFont.systemFontOfSize(24.0)
         self.timePlayedLabel.text = "loading..."
         self.timePlayedView.addSubview(self.timePlayedLabel)
-
-        // Game Mode
-        self.gameModeView = UIView(frame: CGRect(x: 40, y: CGRectGetMaxY(self.timePlayedView.frame) + 20, width: 176, height: (kTitleLabelHeight + kValueLabelHeight)))
+        
+        self.gameModeView = UIView()
         self.addSubview(self.gameModeView)
         
-        self.gameModeTitleLabel = UILabel(frame: CGRect(x: self.gameModeView.bounds.origin.x, y: self.gameModeView.bounds.origin.y, width: self.gameModeView.bounds.width, height: kTitleLabelHeight))
+        self.gameModeTitleLabel = UILabel()
         self.gameModeTitleLabel.textColor = UIColor.whiteColor()
         self.gameModeTitleLabel.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
         self.gameModeTitleLabel.text = "game mode"
         self.gameModeView.addSubview(self.gameModeTitleLabel)
         
-        self.gameModeLabel = UILabel(frame: CGRect(x: self.gameModeView.bounds.origin.x, y: CGRectGetMaxY(self.gameModeTitleLabel.frame), width: self.gameModeView.bounds.width, height: kValueLabelHeight))
+        self.gameModeLabel = UILabel()
         self.gameModeLabel.textColor = UIColor.whiteColor()
         self.gameModeLabel.font = UIFont.systemFontOfSize(24.0)
-        self.gameModeLabel.text = self.dataSource?.gameModeInCurrentSessionInSideMenuView(self)
         self.gameModeView.addSubview(self.gameModeLabel)
         
-        // Session Progress
-        self.sessionProgressView = UIView(frame: CGRect(x: 40, y: CGRectGetMaxY(self.gameModeView.frame) + 20, width: 176, height: (kTitleLabelHeight + kValueLabelHeight)))
+        self.sessionProgressView = UIView()
         self.addSubview(self.sessionProgressView)
         
-        self.sessionProgressTitleLabel = UILabel(frame: CGRect(x: self.sessionProgressView.bounds.origin.x, y: self.sessionProgressView.bounds.origin.y, width: self.sessionProgressView.bounds.width, height: kTitleLabelHeight))
+        self.sessionProgressTitleLabel = UILabel()
         self.sessionProgressTitleLabel.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
         self.sessionProgressTitleLabel.textColor = UIColor.whiteColor()
         self.sessionProgressTitleLabel.text = "session progress"
         self.sessionProgressView.addSubview(self.sessionProgressTitleLabel)
         
-        self.sessionProgressLabel = UILabel(frame: CGRect(x: self.sessionProgressView.bounds.origin.x, y: CGRectGetMaxY(self.sessionProgressTitleLabel.frame), width: self.sessionProgressView.bounds.width, height: kValueLabelHeight))
+        self.sessionProgressLabel = UILabel()
         self.sessionProgressLabel.textColor = UIColor.whiteColor()
         self.sessionProgressLabel.font = UIFont.systemFontOfSize(24.0)
-        self.sessionProgressLabel.text = "\(self.dataSource?.problemIndexInCurrentSessionInSideMenuView(self) as Int!) / \(self.dataSource?.totalNumberOfProblemsInCurrentSessionInSideMenuView(self) as Int!)"
         self.sessionProgressView.addSubview(self.sessionProgressLabel)
-        
-        // User Info
-        self.userInfoView = UIView(frame: CGRect(x: 40, y: CGRectGetMaxY(self.sessionProgressView.frame) + 20, width: 176, height: 100))
+
+        self.userInfoView = UIView()
         self.addSubview(self.userInfoView)
         
-        self.userInfoDisplayNameTitleLabel = UILabel(frame: CGRect(x: self.userInfoView.bounds.origin.x, y: self.userInfoView.bounds.origin.y, width: self.userInfoView.bounds.width, height: kTitleLabelHeight))
+        self.userInfoDisplayNameTitleLabel = UILabel()
         self.userInfoDisplayNameTitleLabel.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
         self.userInfoDisplayNameTitleLabel.textColor = UIColor.whiteColor()
         self.userInfoDisplayNameTitleLabel.text = "name"
         self.userInfoView.addSubview(self.userInfoDisplayNameTitleLabel)
         
-        self.userInfoDisplayNameLabel = UILabel(frame: CGRect(x: self.userInfoView.bounds.origin.x, y: CGRectGetMaxY(self.userInfoDisplayNameTitleLabel.frame), width: self.userInfoView.bounds.width, height: kValueLabelHeight))
+        self.userInfoDisplayNameLabel = UILabel()
         self.userInfoDisplayNameLabel.textColor = UIColor.whiteColor()
         self.userInfoDisplayNameLabel.font = UIFont.systemFontOfSize(24.0)
-        self.userInfoDisplayNameLabel.text = self.dataSource?.currentUserDisplayNameInSideMenuView(self)
         self.userInfoView.addSubview(self.userInfoDisplayNameLabel)
-        
-        self.userInfoAgeTitleLabel = UILabel(frame: CGRect(x: self.userInfoView.bounds.origin.x, y: CGRectGetMaxY(self.userInfoDisplayNameLabel.frame), width: self.userInfoView.bounds.width, height: kTitleLabelHeight))
+
+        self.userInfoAgeTitleLabel = UILabel()
         self.userInfoAgeTitleLabel.font = UIFont.systemFontOfSize(UIFont.smallSystemFontSize())
         self.userInfoAgeTitleLabel.textColor = UIColor.whiteColor()
         self.userInfoAgeTitleLabel.text = "age"
-        if (self.dataSource?.currentUserIsGuestInSideMenuView(self) != true) {
-            self.userInfoView.addSubview(self.userInfoAgeTitleLabel)
-        }
-        
-        self.userInfoAgeLabel = UILabel(frame: CGRect(x: self.userInfoView.bounds.origin.x, y: CGRectGetMaxY(self.userInfoAgeTitleLabel.frame), width: self.userInfoView.bounds.width, height: kValueLabelHeight))
+        self.userInfoView.addSubview(self.userInfoAgeTitleLabel)
+
+        self.userInfoAgeLabel = UILabel()
         self.userInfoAgeLabel.textColor = UIColor.whiteColor()
         self.userInfoAgeLabel.font = UIFont.systemFontOfSize(24.0)
-        self.userInfoAgeLabel.text = String(self.dataSource?.currentUserAgeInSideMenuView(self) as Int!)
-        if (self.dataSource?.currentUserIsGuestInSideMenuView(self) != true) {
-            self.userInfoView.addSubview(self.userInfoAgeLabel)
-        }
+        self.userInfoView.addSubview(self.userInfoAgeLabel)
         
-        self.restartSessionButton = UIButton(frame: CGRect(x: 40, y: CGRectGetMaxY(self.userInfoView.frame) + 80, width: 176, height: 50))
+        self.restartSessionButton = UIButton()
         self.restartSessionButton.contentVerticalAlignment = .Center
         self.restartSessionButton.layer.cornerRadius = 5
         self.restartSessionButton.layer.masksToBounds = true
@@ -166,7 +145,7 @@ class PMSideMenuView: UIView {
         self.restartSessionButton.addTarget(self, action: "didTapRestartSessionButton:", forControlEvents: .TouchUpInside)
         self.addSubview(self.restartSessionButton)
         
-        self.mainMenuButton = UIButton(frame: CGRect(x: 40, y: CGRectGetMaxY(self.restartSessionButton.frame) + 15, width: 176, height: 50))
+        self.mainMenuButton = UIButton()
         self.mainMenuButton.contentVerticalAlignment = .Center
         self.mainMenuButton.layer.cornerRadius = 5
         self.mainMenuButton.layer.masksToBounds = true
@@ -174,6 +153,50 @@ class PMSideMenuView: UIView {
         self.mainMenuButton.setTitle("main menu", forState: .Normal)
         self.mainMenuButton.addTarget(self, action: "didTapMainMenuButton:", forControlEvents: .TouchUpInside)
         self.addSubview(self.mainMenuButton)
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        self.backgroundBlurVisualEffectView.frame = self.bounds
+        
+        self.timePlayedView.frame = CGRect(x: 40, y: 150, width: 176, height: (kTitleLabelHeight + kValueLabelHeight))
+        self.timePlayedTitleLabel.frame = CGRect(x: self.timePlayedView.bounds.origin.x, y: self.timePlayedView.bounds.origin.y, width: self.timePlayedView.bounds.width, height: kTitleLabelHeight)
+        self.timePlayedLabel.frame = CGRect(x: self.timePlayedView.bounds.origin.x, y: CGRectGetMaxY(self.timePlayedTitleLabel.frame), width: self.timePlayedView.bounds.width, height: kValueLabelHeight)
+        if (self.dataSource?.currentUserIsGuestInSideMenuView(self) == true) {
+            self.timePlayedView.hidden = true
+        }
+        
+        self.gameModeView.frame = CGRect(x: 40, y: CGRectGetMaxY(self.timePlayedView.frame) + 20, width: 176, height: (kTitleLabelHeight + kValueLabelHeight))
+        self.gameModeTitleLabel.frame = CGRect(x: self.gameModeView.bounds.origin.x, y: self.gameModeView.bounds.origin.y, width: self.gameModeView.bounds.width, height: kTitleLabelHeight)
+        self.gameModeLabel.frame = CGRect(x: self.gameModeView.bounds.origin.x, y: CGRectGetMaxY(self.gameModeTitleLabel.frame), width: self.gameModeView.bounds.width, height: kValueLabelHeight)
+        self.gameModeLabel.text = self.dataSource?.gameModeInCurrentSessionInSideMenuView(self)
+
+        
+        self.sessionProgressView.frame = CGRect(x: 40, y: CGRectGetMaxY(self.gameModeView.frame) + 20, width: 176, height: (kTitleLabelHeight + kValueLabelHeight))
+        self.sessionProgressTitleLabel.frame = CGRect(x: self.sessionProgressView.bounds.origin.x, y: self.sessionProgressView.bounds.origin.y, width: self.sessionProgressView.bounds.width, height: kTitleLabelHeight)
+        self.sessionProgressLabel.frame = CGRect(x: self.sessionProgressView.bounds.origin.x, y: CGRectGetMaxY(self.sessionProgressTitleLabel.frame), width: self.sessionProgressView.bounds.width, height: kValueLabelHeight)
+        self.sessionProgressLabel.text = "\(self.dataSource?.problemIndexInCurrentSessionInSideMenuView(self) as Int! + 1) / \(self.dataSource?.totalNumberOfProblemsInCurrentSessionInSideMenuView(self) as Int!)"
+
+        self.userInfoView.frame = CGRect(x: 40, y: CGRectGetMaxY(self.sessionProgressView.frame) + 20, width: 176, height: 100)
+        self.userInfoDisplayNameTitleLabel.frame = CGRect(x: self.userInfoView.bounds.origin.x, y: self.userInfoView.bounds.origin.y, width: self.userInfoView.bounds.width, height: kTitleLabelHeight)
+        self.userInfoDisplayNameLabel.frame = CGRect(x: self.userInfoView.bounds.origin.x, y: CGRectGetMaxY(self.userInfoDisplayNameTitleLabel.frame), width: self.userInfoView.bounds.width, height: kValueLabelHeight)
+        self.userInfoAgeTitleLabel.frame = CGRect(x: self.userInfoView.bounds.origin.x, y: CGRectGetMaxY(self.userInfoDisplayNameLabel.frame), width: self.userInfoView.bounds.width, height: kTitleLabelHeight)
+        self.userInfoAgeLabel.frame = CGRect(x: self.userInfoView.bounds.origin.x, y: CGRectGetMaxY(self.userInfoAgeTitleLabel.frame), width: self.userInfoView.bounds.width, height: kValueLabelHeight)
+        self.userInfoDisplayNameLabel.text = self.dataSource?.currentUserDisplayNameInSideMenuView(self)
+        self.userInfoAgeLabel.text = String(self.dataSource?.currentUserAgeInSideMenuView(self) as Int!)
+        if (self.dataSource?.currentUserIsGuestInSideMenuView(self) == true) {
+            self.userInfoAgeTitleLabel.hidden = true
+            self.userInfoAgeLabel.hidden = true
+        }
+        
+        self.restartSessionButton.frame = CGRect(x: 40, y: CGRectGetMaxY(self.userInfoView.frame) + 80, width: 176, height: 50)
+        
+        self.mainMenuButton.frame = CGRect(x: 40, y: CGRectGetMaxY(self.restartSessionButton.frame) + 15, width: 176, height: 50)
     }
     
     func updateTimePlayedLabelWithHoursPlayed(hoursPlayed: Int, minutesPlayed: Int) {

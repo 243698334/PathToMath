@@ -32,30 +32,16 @@ class PMStartGameView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
-        self.summaryLabel = UILabel(frame: .zero)
-        self.startButton = UIButton(frame: .zero)
-        self.logoutButton = UIButton(frame: .zero)
-        self.logoutButtonActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
-        
         self.backgroundColor = .clearColor()
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func drawRect(rect: CGRect) {
-        super.drawRect(rect)
         
-        self.summaryLabel.frame = CGRect(x: kHorizontaladding, y: kSummaryLabelTopMargin, width: rect.width - 2 * kHorizontaladding, height: kSummaryLabelHeight)
+        self.summaryLabel = UILabel()
         self.summaryLabel.textAlignment = .Center
         self.summaryLabel.textColor = UIColor.whiteColor()
         self.summaryLabel.font = UIFont.systemFontOfSize(14.0)
         self.summaryLabel.text = "Loading stats..."
         self.addSubview(self.summaryLabel)
         
-        self.startButton.frame = CGRect(x: kHorizontaladding, y: CGRectGetMaxY(self.summaryLabel.frame) + kVerticalPadding, width: rect.width - 2 * kHorizontaladding, height: kButtonHeight)
+        self.startButton = UIButton()
         self.startButton.setTitle("start", forState: .Normal)
         self.startButton.layer.cornerRadius = 5
         self.startButton.layer.masksToBounds = true
@@ -64,7 +50,7 @@ class PMStartGameView: UIView {
         self.startButton.addTarget(self, action: "didTapStartButton:", forControlEvents: .TouchUpInside)
         self.addSubview(self.startButton)
         
-        self.logoutButton.frame = CGRect(x: kHorizontaladding, y: CGRectGetMaxY(self.startButton.frame) + kVerticalPadding, width: rect.width - 2 * kHorizontaladding, height: kButtonHeight)
+        self.logoutButton = UIButton()
         self.logoutButton.setTitle("log out", forState: .Normal)
         self.logoutButton.layer.cornerRadius = 5
         self.logoutButton.layer.masksToBounds = true
@@ -72,6 +58,20 @@ class PMStartGameView: UIView {
         self.logoutButton.contentVerticalAlignment = .Center
         self.logoutButton.addTarget(self, action: "didTapLogoutButton:", forControlEvents: .TouchUpInside)
         self.addSubview(self.logoutButton)
+        
+        self.logoutButtonActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        self.summaryLabel.frame = CGRect(x: kHorizontaladding, y: kSummaryLabelTopMargin, width: self.bounds.width - 2 * kHorizontaladding, height: kSummaryLabelHeight)
+        self.startButton.frame = CGRect(x: kHorizontaladding, y: CGRectGetMaxY(self.summaryLabel.frame) + kVerticalPadding, width: self.bounds.width - 2 * kHorizontaladding, height: kButtonHeight)
+        self.logoutButton.frame = CGRect(x: kHorizontaladding, y: CGRectGetMaxY(self.startButton.frame) + kVerticalPadding, width: self.bounds.width - 2 * kHorizontaladding, height: kButtonHeight)
     }
     
     func startLogoutActivityIndicatorAnimation() {
